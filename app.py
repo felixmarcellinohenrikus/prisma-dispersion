@@ -366,36 +366,55 @@ if results:
             # Sudut sinar dalam prisma terhadap horizontal
             internal_ray_angle = left_normal_angle - r1_rad
             
-            # ========================================
+           # ========================================
             # HITUNG TITIK KELUAR DI PERMUKAAN KANAN
             # ========================================
-            # Parameterisasi permukaan kanan
-            t_max = prism_size * 2
-            t = np.linspace(0, t_max, 400)
-            ray_x = entry_point_x + t * np.cos(internal_ray_angle)
-            ray_y = entry_point_y + t * np.sin(internal_ray_angle)
+            # Cari perpotongan sinar dengan permukaan kanan menggunakan parameterisasi
             
-            # Cari perpotongan dengan permukaan kanan
-            exit_x, exit_y = None, None
-            for j in range(len(t)-1):
-                # Garis permukaan kanan dari apex ke base_right
-                s = j / len(t)
-                surf_x = apex_x + s * (base_right_x - apex_x)
-                surf_y = apex_y + s * (base_right_y - apex_y)
-                
-                # Cek jarak titik ray ke permukaan
-                dist = abs((ray_x[j] - apex_x) * (base_right_y - apex_y) - 
-                          (ray_y[j] - apex_y) * (base_right_x - apex_x)) / \
-                       np.sqrt((base_right_x - apex_x)**2 + **(base_right_y - apex_y)2)
-                
-                if dist < 0.05:  # Threshold jarak
-                    exit_x = ray_x[j]
-                    exit_y = ray_y[j]
-                    break
+            # Vektor arah sinar dalam prisma
+            ray_dir_x = np.cos(internal_ray_angle)
+            ray_dir_y = np.sin(internal_ray_angle)
             
-            if exit_x is None:
-                exit_x = base_right_x
-                exit_y = base_right_y + 0.5
+            # Vektor permukaan kanan (dari apex ke base_right)
+            surf_dir_x = base_right_x - apex_x
+            surf_dir_y = base_right_y - apex_y
+            
+            # Panjang permukaan kanan
+            surf_length = np.sqrt(surf_dir_x**2 + surf_dir_y**2)
+            
+            # Normalisasi vektor permukaan
+            surf_dir_x /= surf_length
+            surf_dir_y /= surf_length
+            
+            # Cari perpotongan menggunakan rumus garis parametrik
+            # Ray: P = entry_point + t * ray_dir
+            # Surface: Q = apex + u * surf_dir
+            
+            # Solve untuk t dan u
+            denom = ray_dir_x * surf_dir_y - ray_dir_y * surf_dir_x
+            
+            if abs(denom) > 1e-10:  # Tidak paralel
+                dx = apex_x - entry_point_x
+                dy = apex_y - entry_point_y
+                
+                t = (dx * surf_dir_y - dy * surf_dir_x) / denom
+                u = (dx * ray_dir_y - dy * ray_dir_x) / denom
+                
+                # Cek apakah perpotongan ada di segmen permukaan kanan (0 <= u <= 1)
+                # dan di depan sinar (t > 0)
+                if t > 0 and 0 <= u <= 1:
+                    exit_x = entry_point_x + t * ray_dir_x
+                    exit_y = entry_point_y + t * ray_dir_y
+                else:
+                    # Fallback: gunakan titik di permukaan kanan
+                    u = 0.5  # Tengah permukaan
+                    exit_x = apex_x + u * (base_right_x - apex_x)
+                    exit_y = apex_y + u * (base_right_y - apex_y)
+            else:
+                # Sinar paralel dengan permukaan (jarang terjadi)
+                u = 0.5
+                exit_x = apex_x + u * (base_right_x - apex_x)
+                exit_y = apex_y + u * (base_right_y - apex_y)
             
             # ========================================
             # SINAR KELUAR DARI PRISMA
