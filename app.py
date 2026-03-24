@@ -349,7 +349,7 @@ if results:
     sin_r1 = sin_i1 / ref_n
     if sin_r1 > 1.0:
         st.warning("Total internal reflection at entry – cannot draw internal ray.")
-        return fig
+    return fig
     cos_r1 = np.sqrt(1 - sin_r1**2)
     # Refracted direction (inside prism)
     internal_dir = (1/ref_n) * incident_dir + ((1/ref_n)*cos_i1 - cos_r1) * left_inward_normal
