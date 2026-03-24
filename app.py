@@ -53,7 +53,10 @@ st.markdown("""
 <div class="main-header">
     <h1 style='margin: 0;'>🔬 Simulasi Dispersi Cahaya pada Prisma</h1>
     <p style='margin: 10px 0 0 0; font-size: 16px;'>
-        Dikembangkan oleh <strong>Felix Marcellino Henrikus</strong>
+        Dikembangkan oleh <strong>Felix Marcellino Henrikus, S.Si</strong>
+    </p>
+    <p style='margin: 10px 0 0 0; font-size: 16px;'>
+        Program Studi Magister Sains Data, UKSW Salatiga
     </p>
 </div>
 """, unsafe_allow_html=True)
@@ -167,7 +170,7 @@ prism_angle = st.sidebar.slider(
     min_value=30.0,
     max_value=90.0,
     value=60.0,
-    step=1.0,
+    step=0.5,
     help="Sudut apex prisma (default 60° untuk prisma sama kaki)"
 )
 
@@ -252,7 +255,7 @@ if results:
     st.success(f"**🌈 Sudut Dispersi (Δδ):** {delta_range:.2f}°")
 else:
     st.error("⚠️ Tidak ada hasil perhitungan. Coba ubah sudut datang atau sudut prisma.")
-    st.warning("💡 **Saran:** Gunakan sudut datang antara 30°-60° dan sudut prisma 60°")
+    st.warning("💡 **Saran:** Gunakan sudut datang antara 30°-60° dan sudut prisma 60° untuk visualisasi yang ideal.")
 
 # ============================================================================
 # VISUALISASI RAY TRACING
@@ -263,11 +266,11 @@ st.markdown("### 🔍 Visualisasi Ray Tracing")
 if results:
     def create_ray_tracing_plot(incident_angle, prism_angle, results, show_spectrum, show_angles):
         # Ukuran figure lebih kecil
-        fig, ax = plt.subplots(figsize=(10, 6), dpi=100)
+        fig, ax = plt.subplots(figsize=(10, 7), dpi=100)
         fig.patch.set_facecolor('#f8f9fa')
         ax.set_facecolor('#ffffff')
         
-        prism_size = 4  # Ukuran prisma lebih kecil
+        prism_size = 4
         apex_x = 0
         apex_y = prism_size * np.sqrt(3) / 2
         base_left_x = -prism_size / 2
@@ -275,6 +278,7 @@ if results:
         base_right_x = prism_size / 2
         base_right_y = 0
         
+        # Gambar prisma
         prism_vertices = np.array([
             [apex_x, apex_y],
             [base_left_x, base_left_y],
@@ -289,35 +293,52 @@ if results:
         
         # Sudut permukaan prisma
         A_rad = np.radians(prism_angle)
-        left_surface_angle = np.pi/2 - A_rad/2  # Normal permukaan kiri
-        right_surface_angle = np.pi/2 + A_rad/2  # Normal permukaan kanan
         
-        # Titik masuk sinar (di permukaan kiri prisma)
-        entry_point_x = base_left_x + 0.3 * (apex_x - base_left_x)
-        entry_point_y = 0.3 * apex_y
+        # Normal permukaan kiri (tegak lurus sisi kiri)
+        # Sisi kiri memiliki sudut 60° dari horizontal untuk prisma sama sisi
+        left_surface_angle_deg = 90 - prism_angle/2  # sudut sisi kiri terhadap horizontal
+        left_surface_normal_angle = np.radians(left_surface_angle_deg + 90)  # normal tegak lurus sisi
         
-        # Sinar datang
+        # Normal permukaan kanan
+        right_surface_angle_deg = 90 + prism_angle/2  # sudut sisi kanan terhadap horizontal
+        right_surface_normal_angle = np.radians(right_surface_angle_deg - 90)  # normal tegak lurus sisi
+        
+        # Titik masuk sinar (di permukaan kiri prisma, sekitar 1/3 dari alas)
+        entry_point_x = base_left_x + 0.35 * (apex_x - base_left_x)
+        entry_point_y = 0.35 * apex_y
+        
+        # Sinar datang - datang dari kiri bawah ke kanan atas
         i1_rad = np.radians(incident_angle)
-        # Sudut sinar datang terhadap horizontal
-        incident_ray_angle = -i1_rad  # Dari kiri atas ke kanan bawah
+        # Arah sinar datang (dari kiri bawah ke titik masuk)
+        incident_direction = left_surface_normal_angle - i1_rad - np.pi
         
-        incident_length = 3
-        incident_start_x = entry_point_x - incident_length * np.cos(incident_ray_angle)
-        incident_start_y = entry_point_y + incident_length * np.sin(incident_ray_angle)
+        incident_length = 3.5
+        incident_start_x = entry_point_x + incident_length * np.cos(incident_direction)
+        incident_start_y = entry_point_y + incident_length * np.sin(incident_direction)
         
         # Gambar sinar datang
         ax.plot([incident_start_x, entry_point_x], 
                 [incident_start_y, entry_point_y], 
                 'k-', linewidth=2, label='Sinar Datang', zorder=5)
         
-        # Gambar garis normal di titik masuk
+        # Perpanjang sinar datang (garis putus-putus) untuk sudut deviasi
+        extension_length = 4
+        extension_end_x = entry_point_x - extension_length * np.cos(incident_direction)
+        extension_end_y = entry_point_y - extension_length * np.sin(incident_direction)
+        ax.plot([entry_point_x, extension_end_x],
+                [entry_point_y, extension_end_y],
+                'k:', linewidth=1, alpha=0.5)
+        
+        # Gambar garis normal di titik masuk (permukaan kiri)
         normal_length = 0.8
-        ax.plot([entry_point_x, entry_point_x + normal_length * np.cos(left_surface_angle)],
-                [entry_point_y, entry_point_y + normal_length * np.sin(left_surface_angle)],
+        ax.plot([entry_point_x - normal_length * np.cos(left_surface_normal_angle),
+                 entry_point_x + normal_length * np.cos(left_surface_normal_angle)],
+                [entry_point_y - normal_length * np.sin(left_surface_normal_angle),
+                 entry_point_y + normal_length * np.sin(left_surface_normal_angle)],
                 'k--', linewidth=1, alpha=0.5)
         
-        # Variabel untuk menyimpan titik keluar
-        exit_points = []
+        # Simpan titik keluar untuk setiap warna
+        exit_points_data = []
         
         for i, result in enumerate(results):
             if not show_spectrum and i not in [0, len(results)//2, len(results)-1]:
@@ -327,128 +348,234 @@ if results:
             r2_rad = np.radians(result['r2'])
             i2_rad = np.radians(result['i2'])
             
-            # Sinar di dalam prisma (dibiaskan)
-            # Sudut bias terhadap normal
-            internal_ray_angle = left_surface_angle - r1_rad
+            # Sinar di dalam prisma
+            # Sudut sinar di dalam prisma terhadap horizontal
+            internal_direction = left_surface_normal_angle - r1_rad
             
             # Hitung titik keluar di permukaan kanan
-            # Parameter t untuk perpotongan dengan permukaan kanan
+            # Parameterisasi permukaan kanan (dari apex ke base_right)
             surface_right_start = np.array([apex_x, apex_y])
             surface_right_end = np.array([base_right_x, base_right_y])
-            surface_right_dir = surface_right_end - surface_right_start
             
-            # Ray dari entry point dengan arah internal_ray_angle
-            ray_dir = np.array([np.cos(internal_ray_angle), np.sin(internal_ray_angle)])
-            
-            # Cari perpotongan
-            t = np.linspace(0, prism_size, 100)
-            ray_x = entry_point_x + t * ray_dir[0]
-            ray_y = entry_point_y + t * ray_dir[1]
+            # Cari perpotongan ray dengan permukaan kanan
+            t_max = prism_size * 1.5
+            t = np.linspace(0, t_max, 200)
+            ray_x = entry_point_x + t * np.cos(internal_direction)
+            ray_y = entry_point_y + t * np.sin(internal_direction)
             
             # Persamaan garis permukaan kanan
+            exit_x, exit_y = None, None
             for j in range(len(t)-1):
-                if ((ray_x[j] - surface_right_start[0]) * (surface_right_end[1] - surface_right_start[1]) -
-                    (ray_y[j] - surface_right_start[1]) * (surface_right_end[0] - surface_right_start[0])) * \
-                   ((ray_x[j+1] - surface_right_start[0]) * (surface_right_end[1] - surface_right_start[1]) -
-                    (ray_y[j+1] - surface_right_start[1]) * (surface_right_end[0] - surface_right_start[0])) <= 0:
-                    # Interpolasi titik potong
-                    frac = abs((ray_x[j] - surface_right_start[0]) * (surface_right_end[1] - surface_right_start[1]) -
-                              (ray_y[j] - surface_right_start[1]) * (surface_right_end[0] - surface_right_start[0]))
-                    frac2 = abs((ray_x[j+1] - surface_right_start[0]) * (surface_right_end[1] - surface_right_start[1]) -
-                               (ray_y[j+1] - surface_right_start[1]) * (surface_right_end[0] - surface_right_start[0]))
-                    total = frac + frac2
-                    if total > 0:
-                        alpha = frac / total
-                        exit_x = ray_x[j] + alpha * (ray_x[j+1] - ray_x[j])
-                        exit_y = ray_y[j] + alpha * (ray_y[j+1] - ray_y[j])
+                p1 = surface_right_start
+                p2 = surface_right_end
+                p3 = np.array([ray_x[j], ray_y[j]])
+                p4 = np.array([ray_x[j+1], ray_y[j+1]])
+                
+                # Cek perpotongan
+                d1 = (p4[0]-p3[0])*(p1[1]-p3[1]) - (p4[1]-p3[1])*(p1[0]-p3[0])
+                d2 = (p4[0]-p3[0])*(p2[1]-p3[1]) - (p4[1]-p3[1])*(p2[0]-p3[0])
+                
+                if d1 * d2 <= 0:
+                    # Ada perpotongan
+                    if abs(d1 - d2) > 1e-10:
+                        alpha = abs(d1) / (abs(d1) + abs(d2))
+                        exit_x = p1[0] + alpha * (p2[0] - p1[0])
+                        exit_y = p1[1] + alpha * (p2[1] - p1[1])
                     else:
                         exit_x = ray_x[j]
                         exit_y = ray_y[j]
                     break
-            else:
+            
+            if exit_x is None:
                 exit_x = ray_x[-1]
                 exit_y = ray_y[-1]
             
-            exit_points.append((exit_x, exit_y))
+            exit_points_data.append({
+                'exit_x': exit_x,
+                'exit_y': exit_y,
+                'i2_rad': i2_rad,
+                'color': result['color'] if show_spectrum else 'r',
+                'label': result['warna'] if show_spectrum and i < 3 else ""
+            })
             
             # Gambar sinar di dalam prisma
-            if show_spectrum:
-                ax.plot([entry_point_x, exit_x],
-                        [entry_point_y, exit_y],
-                        color=result['color'], linewidth=1.5, alpha=0.7)
-            else:
-                ax.plot([entry_point_x, exit_x],
-                        [entry_point_y, exit_y],
-                        'r-', linewidth=1.5, alpha=0.7)
+            line_style = '-' if show_spectrum else '--'
+            ax.plot([entry_point_x, exit_x],
+                    [entry_point_y, exit_y],
+                    color=result['color'] if show_spectrum else 'blue',
+                    linewidth=1.5, alpha=0.7, linestyle=line_style)
+        
+        # Gambar sinar keluar untuk setiap warna
+        for i, data in enumerate(exit_points_data):
+            exit_x = data['exit_x']
+            exit_y = data['exit_y']
+            i2_rad = data['i2_rad']
+            color = data['color']
+            label = data['label']
             
             # Sinar keluar dari prisma
-            # Normal permukaan kanan
-            normal_right_angle = right_surface_angle - np.pi
+            # Arah sinar keluar
+            exit_direction = right_surface_normal_angle - i2_rad
             
-            # Sudut sinar keluar
-            exit_ray_angle = normal_right_angle + i2_rad
-            
-            exit_length = 3
-            final_exit_x = exit_x + exit_length * np.cos(exit_ray_angle)
-            final_exit_y = exit_y + exit_length * np.sin(exit_ray_angle)
+            exit_length = 3.5
+            final_exit_x = exit_x + exit_length * np.cos(exit_direction)
+            final_exit_y = exit_y + exit_length * np.sin(exit_direction)
             
             # Gambar sinar keluar
-            if show_spectrum:
-                ax.plot([exit_x, final_exit_x],
-                        [exit_y, final_exit_y],
-                        color=result['color'], linewidth=2, alpha=0.9,
-                        label=f"{result['warna']}" if i < 3 else "")
-            else:
-                ax.plot([exit_x, final_exit_x],
-                        [exit_y, final_exit_y],
-                        'r-', linewidth=2)
+            ax.plot([exit_x, final_exit_x],
+                    [exit_y, final_exit_y],
+                    color=color, linewidth=2, alpha=0.9,
+                    label=label if label else "")
             
-            # Gambar garis normal di titik keluar
-            ax.plot([exit_x, exit_x + normal_length * np.cos(normal_right_angle)],
-                    [exit_y, exit_y + normal_length * np.sin(normal_right_angle)],
+            # Gambar garis normal di titik keluar (permukaan kanan)
+            ax.plot([exit_x - normal_length * np.cos(right_surface_normal_angle),
+                     exit_x + normal_length * np.cos(right_surface_normal_angle)],
+                    [exit_y - normal_length * np.sin(right_surface_normal_angle),
+                     exit_y + normal_length * np.sin(right_surface_normal_angle)],
                     'k--', linewidth=1, alpha=0.5)
+            
+            # Perpanjang sinar keluar (garis putus-putus) untuk sudut deviasi
+            ax.plot([exit_x, exit_x - 2 * np.cos(exit_direction)],
+                    [exit_y, exit_y - 2 * np.sin(exit_direction)],
+                    color=color, linewidth=0.5, alpha=0.3, linestyle=':')
         
-        # Gambar busur sudut
+        # Gambar label sudut-sudut
         if show_angles and len(results) > 0:
             result = results[0]
-            arc_radius = 0.6
+            arc_radius = 0.5
             
-            # Sudut i1
-            arc_angles = np.linspace(incident_ray_angle, left_surface_angle, 50)
+            # Sudut i₁ (sudut datang) - antara sinar datang dan normal
+            start_angle = incident_direction
+            end_angle = left_surface_normal_angle
+            # Pastikan busur tidak lebih dari 180 derajat
+            if abs(end_angle - start_angle) > np.pi:
+                if end_angle > start_angle:
+                    start_angle += 2*np.pi
+                else:
+                    end_angle += 2*np.pi
+            
+            arc_angles = np.linspace(start_angle, end_angle, 50)
             arc_x = entry_point_x + arc_radius * np.cos(arc_angles)
             arc_y = entry_point_y + arc_radius * np.sin(arc_angles)
-            ax.plot(arc_x, arc_y, 'b-', linewidth=1.5)
-            ax.text(entry_point_x + 0.7, entry_point_y + 0.2, 'i₁', fontsize=10, 
-                    fontweight='bold', color='blue')
+            ax.plot(arc_x, arc_y, 'b-', linewidth=2)
+            # Posisi label i₁
+            mid_angle = (start_angle + end_angle) / 2
+            ax.text(entry_point_x + (arc_radius+0.15) * np.cos(mid_angle),
+                    entry_point_y + (arc_radius+0.15) * np.sin(mid_angle),
+                    'i₁', fontsize=11, fontweight='bold', color='blue',
+                    ha='center', va='center')
             
-            # Sudut r1
+            # Sudut r₁ (sudut bias pertama) - antara sinar dalam prisma dan normal
             r1_rad = np.radians(result['r1'])
-            arc_angles = np.linspace(left_surface_angle - r1_rad, left_surface_angle, 50)
-            arc_x = entry_point_x + arc_radius * 0.5 * np.cos(arc_angles)
-            arc_y = entry_point_y + arc_radius * 0.5 * np.sin(arc_angles)
-            ax.plot(arc_x, arc_y, 'g-', linewidth=1.5)
-            ax.text(entry_point_x + 0.2, entry_point_y + 0.1, 'r₁', fontsize=10,
-                    fontweight='bold', color='green')
+            internal_direction = left_surface_normal_angle - r1_rad
+            start_angle = internal_direction
+            end_angle = left_surface_normal_angle
             
-            # Sudut i2 (gunakan titik keluar pertama)
-            if len(exit_points) > 0:
-                exit_x, exit_y = exit_points[0]
-                i2_rad = np.radians(result['i2'])
-                arc_angles = np.linspace(normal_right_angle, normal_right_angle + i2_rad, 50)
-                arc_x = exit_x + arc_radius * 0.5 * np.cos(arc_angles)
-                arc_y = exit_y + arc_radius * 0.5 * np.sin(arc_angles)
-                ax.plot(arc_x, arc_y, 'm-', linewidth=1.5)
-                ax.text(exit_x - 0.3, exit_y - 0.3, 'i₂', fontsize=10,
-                        fontweight='bold', color='magenta')
+            arc_angles = np.linspace(start_angle, end_angle, 50)
+            arc_x = entry_point_x + arc_radius * 0.65 * np.cos(arc_angles)
+            arc_y = entry_point_y + arc_radius * 0.65 * np.sin(arc_angles)
+            ax.plot(arc_x, arc_y, 'g-', linewidth=2)
+            # Posisi label r₁
+            mid_angle = (start_angle + end_angle) / 2
+            ax.text(entry_point_x + (arc_radius*0.65+0.1) * np.cos(mid_angle),
+                    entry_point_y + (arc_radius*0.65+0.1) * np.sin(mid_angle),
+                    'r₁', fontsize=10, fontweight='bold', color='green',
+                    ha='center', va='center')
+            
+            # Sudut i₂ (sudut datang kedua) - antara sinar dalam prisma dan normal permukaan kanan
+            if len(exit_points_data) > 0:
+                data = exit_points_data[0]
+                exit_x = data['exit_x']
+                exit_y = data['exit_y']
+                i2_rad = data['i2_rad']
+                
+                # Arah sinar dalam prisma menuju permukaan kanan
+                ray_to_surface = np.arctan2(exit_y - entry_point_y, exit_x - entry_point_x)
+                
+                # Normal permukaan kanan (arah keluar dari prisma)
+                normal_right_out = right_surface_normal_angle
+                
+                # Sudut i₂
+                start_angle = ray_to_surface
+                end_angle = normal_right_out
+                
+                # Sesuaikan agar busur tidak terlalu besar
+                while abs(end_angle - start_angle) > np.pi:
+                    if end_angle > start_angle:
+                        end_angle -= 2*np.pi
+                    else:
+                        start_angle -= 2*np.pi
+                
+                arc_angles = np.linspace(start_angle, end_angle, 50)
+                arc_x = exit_x + arc_radius * 0.65 * np.cos(arc_angles)
+                arc_y = exit_y + arc_radius * 0.65 * np.sin(arc_angles)
+                ax.plot(arc_x, arc_y, 'm-', linewidth=2)
+                # Posisi label i₂
+                mid_angle = (start_angle + end_angle) / 2
+                ax.text(exit_x + (arc_radius*0.65+0.12) * np.cos(mid_angle),
+                        exit_y + (arc_radius*0.65+0.12) * np.sin(mid_angle),
+                        'i₂', fontsize=10, fontweight='bold', color='magenta',
+                        ha='center', va='center')
+            
+            # Sudut puncak prisma (A)
+            apex_arc_radius = 0.7
+            # Sudut sisi kiri dan kanan prisma di apex
+            left_side_angle = np.arctan2(base_left_y - apex_y, base_left_x - apex_x)
+            right_side_angle = np.arctan2(base_right_y - apex_y, base_right_x - apex_x)
+            
+            arc_angles = np.linspace(right_side_angle, left_side_angle, 50)
+            arc_x = apex_x + apex_arc_radius * np.cos(arc_angles)
+            arc_y = apex_y + apex_arc_radius * np.sin(arc_angles)
+            ax.plot(arc_x, arc_y, 'c-', linewidth=2)
+            ax.text(apex_x, apex_y - apex_arc_radius - 0.15,
+                    f'A = {prism_angle}°', fontsize=10, fontweight='bold',
+                    color='cyan', ha='center', va='top')
+            
+            # Sudut deviasi (δ) - untuk sinar merah saja
+            # Sudut antara perpanjangan sinar datang dan sinar keluar
+            if len(exit_points_data) > 0:
+                data = exit_points_data[0]
+                exit_direction = right_surface_normal_angle - data['i2_rad']
+                
+                # Cari titik perpotongan antara perpanjangan sinar datang dan sinar keluar
+                # Sinar datang: dari incident_start ke entry_point, diperpanjang
+                # Sinar keluar: dari exit_point ke final_exit, diperpanjang
+                
+                # Untuk visualisasi, gambar busur sudut deviasi di dekat sinar keluar
+                dev_arc_radius = 2.5
+                dev_center_x = exit_x
+                dev_center_y = exit_y
+                
+                # Sudut perpanjangan sinar datang (ke depan)
+                incident_extension_angle = incident_direction + np.pi
+                # Sudut sinar keluar
+                exit_angle = exit_direction
+                
+                # Gambar busur sudut deviasi
+                start_angle = min(incident_extension_angle, exit_angle)
+                end_angle = max(incident_extension_angle, exit_angle)
+                
+                arc_angles = np.linspace(start_angle, end_angle, 50)
+                arc_x = dev_center_x + dev_arc_radius * np.cos(arc_angles)
+                arc_y = dev_center_y + dev_arc_radius * np.sin(arc_angles)
+                ax.plot(arc_x, arc_y, 'r-', linewidth=2, linestyle='--')
+                
+                # Label sudut deviasi
+                mid_angle = (start_angle + end_angle) / 2
+                ax.text(dev_center_x + (dev_arc_radius+0.3) * np.cos(mid_angle),
+                        dev_center_y + (dev_arc_radius+0.3) * np.sin(mid_angle),
+                        f'δ = {result["delta"]:.1f}°', fontsize=10,
+                        fontweight='bold', color='red',
+                        ha='center', va='center')
         
-        # Set limits yang lebih tight
+        # Set limits
         ax.set_xlim(-6, 6)
-        ax.set_ylim(-1, 6)
+        ax.set_ylim(-1, 7)
         ax.set_aspect('equal')
         ax.axis('off')
         
         if show_spectrum:
-            ax.legend(loc='upper right', fontsize=8, framealpha=0.9)
+            ax.legend(loc='upper right', fontsize=9, framealpha=0.9)
         
         plt.tight_layout()
         return fig
@@ -691,7 +818,7 @@ st.markdown("---")
 st.markdown("""
 <div class="footer">
     <h4>🔬 Simulasi Dispersi Cahaya pada Prisma</h4>
-    <p><em>Dikembangkan oleh Felix Marcellino Henrikus</em></p>
-    <p>Optika Geometri | Fisika UKSW | Streamlit Dashboard</p>
+    <p><em>Dikembangkan oleh Felix Marcellino Henrikus. S.Si.</em></p>
+    <p>Untuk pembelajaran Optika Geometri di Fisika UKSW Salatiga</p>
 </div>
 """, unsafe_allow_html=True)
