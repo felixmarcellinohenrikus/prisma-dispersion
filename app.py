@@ -551,17 +551,17 @@ if results:
                             fontsize=11, fontweight='bold', color='black',
                             ha='center', va='center', zorder=7)
     
-    # Set limits
-    ax.set_xlim(-7.5, 7.5)
-    ax.set_ylim(-2.5, 6)
-    ax.set_aspect('equal')
-    ax.axis('off')
-
-    if show_spectrum:
-        ax.legend(loc='upper left', fontsize=9, framealpha=0.9, facecolor='white')
-
-    plt.tight_layout()
-    return fig
+        # Set limits
+        ax.set_xlim(-7.5, 7.5)
+        ax.set_ylim(-2.5, 6)
+        ax.set_aspect('equal')
+        ax.axis('off')
+    
+        if show_spectrum:
+            ax.legend(loc='upper left', fontsize=9, framealpha=0.9, facecolor='white')
+    
+        plt.tight_layout()
+        return fig
 
     fig = create_ray_tracing_plot(incident_angle, prism_angle, results, show_spectrum, show_angles)
     st.pyplot(fig)
