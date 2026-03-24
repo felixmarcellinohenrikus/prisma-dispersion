@@ -308,7 +308,7 @@ if results:
         
         # Sinar datang dari KIRI, menuju entry point
         # Arah sinar: normal - i1 (karena datang dari kiri)
-        incident_ray_angle = normal_left_angle + np.pi - i1_rad
+        incident_ray_angle = normal_left_angle + np.pi + i1_rad
         
         incident_len = 4.0
         # Sinar datang: dari incident_start MENUJU entry point
