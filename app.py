@@ -428,26 +428,26 @@ if results:
             # i₁ - OUTSIDE (antara sinar datang dan normal)
             start_i1 = np.pi - incident_ray_angle
             end_i1 = normal_left_angle
-
-            dx_start = np.cos(start_i1)
-            dy_start = np.sin(start_i1)
-            dx_end = np.cos(end_i1)
-            dy_end = np.sin(end_i1)
             
-            # Hitung sudut tengah untuk label
-            mid_i1 = np.arctan2((dy_start + dy_end)/2, (dx_start + dx_end)/2)
+            # Hitung selis sudut
+            angle_diff = end_i1 - start_i1
             
-            # Draw arc dengan angle yang sudah dipastikan benar
+            # Normalisasi ke range [-π, π]
+            while angle_diff > np.pi:
+                angle_diff -= 2*np.pi
+            while angle_diff < -np.pi:
+                angle_diff += 2*np.pi
+            
+            # Pastikan busur selalu positif (menggambar ke arah yang benar)
+            if angle_diff < 0:
+                start_i1, end_i1 = end_i1, start_i1
+                angle_diff = -angle_diff
+            
+            # Draw arc
             arc_i1 = np.linspace(start_i1, end_i1, 50)
             ax.plot(entry_x + arc_r * np.cos(arc_i1),
                     entry_y + arc_r * np.sin(arc_i1),
                     'k-', linewidth=1.8, zorder=6)
-            
-            # Label
-            ax.text(entry_x + (arc_r + 0.12) * np.cos(mid_i1),
-                    entry_y + (arc_r + 0.12) * np.sin(mid_i1),
-                    'i₁', fontsize=12, fontweight='bold', color='black',
-                    ha='center', va='center', zorder=7)
             
             # r₁ - INSIDE (antara sinar dalam dan normal)
             start_r1 = normal_left_angle
