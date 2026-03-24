@@ -426,20 +426,23 @@ if results:
             arc_r = 0.35
             
             # i₁ - OUTSIDE (antara sinar datang dan normal)
-            start_i1 = normal_left_angle
-            end_i1 = incident_ray_angle
+            start_i1 = incident_ray_angle
+            end_i1 = normal_left_angle
             
+            # Sesuaikan agar busur < 180°
             while abs(end_i1 - start_i1) > np.pi:
                 if end_i1 > start_i1:
                     end_i1 -= 2*np.pi
                 else:
                     start_i1 -= 2*np.pi
             
+            # Draw arc
             arc_i1 = np.linspace(start_i1, end_i1, 50)
             ax.plot(entry_x + arc_r * np.cos(arc_i1),
                     entry_y + arc_r * np.sin(arc_i1),
                     'k-', linewidth=1.8, zorder=6)
             
+            # Label
             mid_i1 = (start_i1 + end_i1) / 2
             ax.text(entry_x + (arc_r + 0.12) * np.cos(mid_i1),
                     entry_y + (arc_r + 0.12) * np.sin(mid_i1),
