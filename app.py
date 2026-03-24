@@ -265,320 +265,239 @@ st.markdown("### 🔍 Visualisasi Ray Tracing")
 
 if results:
     def create_ray_tracing_plot(incident_angle, prism_angle, results, show_spectrum, show_angles):
-        fig, ax = plt.subplots(figsize=(12, 8), dpi=100)
+        fig, ax = plt.subplots(figsize=(11, 7), dpi=100)
         fig.patch.set_facecolor('#f8f9fa')
         ax.set_facecolor('#ffffff')
-    
+        
         # ========================================
-        # DYNAMIC PRISM GEOMETRY (isosceles triangle)
+        # PRISM - Segitiga sama kaki
         # ========================================
-        apex_y = 4.0
-        base_y = -1.5
-        height = apex_y - base_y
-        half_base = height * np.tan(np.radians(prism_angle / 2))
-        apex_x = 0.0
-        base_left_x = -half_base
-        base_right_x = half_base
-    
-        prism_vertices = np.array([
-            [apex_x, apex_y],
-            [base_left_x, base_y],
-            [base_right_x, base_y]
-        ])
-    
-        prism_patch = Polygon(prism_vertices, closed=True,
-                              fill=True, alpha=0.15,
-                              edgecolor='#000000', linewidth=1.5,
-                              facecolor='#87CEEB')
-        ax.add_patch(prism_patch)
-    
+        prism_height = 4.5
+        apex_x, apex_y = 0, prism_height
+        base_width = prism_height * 2 * np.tan(np.radians(prism_angle/2))
+        base_left_x, base_y = -base_width/2, 0
+        base_right_x, _ = base_width/2, 0
+        
+        # Draw prism
+        prism = Polygon([[apex_x, apex_y], [base_left_x, base_y], [base_right_x, base_y]],
+                        fill=True, alpha=0.2, edgecolor='black', linewidth=1.5, facecolor='skyblue')
+        ax.add_patch(prism)
+        
         # ========================================
-        # SURFACE NORMALS AND TANGENTS
+        # NORMAL VECTORS (outward)
         # ========================================
-        # Left side: from base_left to apex
-        left_side_vec = np.array([apex_x - base_left_x, apex_y - base_y])
-        left_side_len = np.linalg.norm(left_side_vec)
-        left_unit = left_side_vec / left_side_len
-    
-        # Outward normal for left side (pointing out of prism)
-        # For a clockwise polygon, outward normal is (dy, -dx) where (dx,dy) is the side vector from base_left to apex
-        outward_normal_left = np.array([left_unit[1], -left_unit[0]])
-        # Inward normal is opposite
-        left_inward_normal = -outward_normal_left
-    
-        # Tangent along left side pointing towards the base (from entry point towards base_left)
-        # This is the direction of increasing i1 (positive rotation)
-        tangent_left = (np.array([base_left_x, base_y]) - np.array([apex_x, apex_y])) / left_side_len   # points down-left
-    
-        # Right side: from apex to base_right
-        right_side_vec = np.array([base_right_x - apex_x, base_y - apex_y])
-        right_side_len = np.linalg.norm(right_side_vec)
-        right_unit = right_side_vec / right_side_len
-    
-        # Outward normal for right side (pointing out of prism)
-        outward_normal_right = np.array([right_unit[1], -right_unit[0]])
-        # Inward normal
-        right_inward_normal = -outward_normal_right
-    
-        # Tangent along right side pointing towards the base (from exit point towards base_right)
-        tangent_right = (np.array([base_right_x, base_y]) - np.array([apex_x, apex_y])) / right_side_len   # points down-right
-    
+        # Left face: dari base kiri ke apex
+        left_face_angle = np.arctan2(apex_y - base_y, apex_x - base_left_x)
+        left_normal_angle = left_face_angle - np.pi/2  # Normal keluar (ke kiri)
+        
+        # Right face: dari apex ke base kanan  
+        right_face_angle = np.arctan2(base_y - apex_y, base_right_x - apex_x)
+        right_normal_angle = right_face_angle + np.pi/2  # Normal keluar (ke kanan)
+        
         # ========================================
-        # ENTRY POINT (on left side, 1/3 from base)
+        # ENTRY POINT (40% dari alas ke atas di sisi kiri)
         # ========================================
-        t_entry = 0.33  # fraction from base to apex
-        entry_point = (1 - t_entry) * np.array([base_left_x, base_y]) + t_entry * np.array([apex_x, apex_y])
-    
+        entry_x = base_left_x + 0.4 * (apex_x - base_left_x)
+        entry_y = base_y + 0.4 * (apex_y - base_y)
+        
         # ========================================
-        # INCIDENT RAY (from left)
+        # INCIDENT RAY - dari KIRI horizontal
         # ========================================
-        i1_rad = np.radians(incident_angle)
-    
-        # Incident ray direction (from start point to entry point)
-        # ray_dir = cos(i1)*outward_normal + sin(i1)*tangent (tangent points towards base)
-        incident_dir = np.cos(i1_rad) * outward_normal_left + np.sin(i1_rad) * tangent_left
-        incident_dir = incident_dir / np.linalg.norm(incident_dir)
-    
-        # Start point far to the left along the opposite direction
-        incident_start = entry_point - 5.0 * incident_dir
-        ax.plot([incident_start[0], entry_point[0]],
-                [incident_start[1], entry_point[1]],
+        i1 = np.radians(incident_angle)
+        
+        # Arah sinar datang: dari kiri menuju entry point
+        # Sudut sinar terhadap horizontal
+        incident_angle_global = left_normal_angle + np.pi - i1
+        
+        incident_dir = np.array([np.cos(incident_angle_global), np.sin(incident_angle_global)])
+        incident_start = np.array([entry_x, entry_y]) - 4.5 * incident_dir
+        
+        ax.plot([incident_start[0], entry_x], [incident_start[1], entry_y], 
                 'k-', linewidth=2.5, label='Sinar Datang', zorder=5)
-    
-        # Extension line for deviation (forward direction beyond entry)
-        extension_forward = entry_point + 5.0 * incident_dir
-        ax.plot([entry_point[0], extension_forward[0]],
-                [entry_point[1], extension_forward[1]],
-                'k:', linewidth=1, alpha=0.4, zorder=1)
-    
+        
+        # Perpanjangan sinar datang (titik-titik)
+        extension_end = np.array([entry_x, entry_y]) + 6 * incident_dir
+        ax.plot([entry_x, extension_end[0]], [entry_y, extension_end[1]], 
+                'k:', linewidth=0.8, alpha=0.5, zorder=1)
+        
         # ========================================
-        # REFRACTION INSIDE PRISM (reference wavelength)
+        # REFRACTED RAY INSIDE (r1)
         # ========================================
-        # Use the first result (red) for the internal ray
-        ref_n = results[0]['n']
-    
-        # Angle of incidence relative to inward normal (dot product = cos(i1))
-        cos_i1 = np.dot(incident_dir, left_inward_normal)
-        # Ensure it's in [-1,1] due to numerical errors
-        cos_i1 = np.clip(cos_i1, -1.0, 1.0)
-        sin_i1 = np.sqrt(1 - cos_i1**2)
-    
-        # Snell: n_air * sin_i1 = n * sin_r1
-        sin_r1 = sin_i1 / ref_n
-        if sin_r1 > 1.0:
-            st.warning("Total internal reflection at entry – cannot draw internal ray.")
-            return fig
-        cos_r1 = np.sqrt(1 - sin_r1**2)
-    
-        # Refracted direction (inside prism) using vector Snell
-        # internal_dir = (1/ref_n) * incident_dir + ( (1/ref_n)*cos_i1 - cos_r1 ) * left_inward_normal
-        internal_dir = (1/ref_n) * incident_dir + ((1/ref_n) * cos_i1 - cos_r1) * left_inward_normal
-        internal_dir = internal_dir / np.linalg.norm(internal_dir)
-    
-        # Find intersection with right side
-        apex_vec = np.array([apex_x, apex_y])
-        right_side_vec = np.array([base_right_x - apex_x, base_y - apex_y])
-        denom = internal_dir[0] * right_side_vec[1] - internal_dir[1] * right_side_vec[0]
-        if abs(denom) > 1e-10:
-            dx = apex_vec[0] - entry_point[0]
-            dy = apex_vec[1] - entry_point[1]
-            t = (dx * right_side_vec[1] - dy * right_side_vec[0]) / denom
-            u = (dx * internal_dir[1] - dy * internal_dir[0]) / denom
-            if t > 0 and 0 <= u <= 1:
-                exit_point = entry_point + t * internal_dir
-            else:
-                # fallback – use midpoint
-                u = 0.5
-                exit_point = apex_vec + u * right_side_vec
+        n_red = results[0]['n']
+        r1 = np.arcsin(np.sin(i1) / n_red)
+        
+        # Arah sinar dalam prisma
+        internal_angle = left_normal_angle - r1
+        internal_dir = np.array([np.cos(internal_angle), np.sin(internal_angle)])
+        
+        # Cari titik keluar di sisi kanan
+        t = np.linspace(0, prism_height*2, 100)
+        ray_x = entry_x + t * internal_dir[0]
+        ray_y = entry_y + t * internal_dir[1]
+        
+        # Persamaan sisi kanan
+        for j in range(len(t)-1):
+            if ((ray_x[j] - apex_x) * (base_y - apex_y) - (ray_y[j] - apex_y) * (base_right_x - apex_x)) * \
+               ((ray_x[j+1] - apex_x) * (base_y - apex_y) - (ray_y[j+1] - apex_y) * (base_right_x - apex_x)) <= 0:
+                exit_x = ray_x[j]
+                exit_y = ray_y[j]
+                break
         else:
-            u = 0.5
-            exit_point = apex_vec + u * right_side_vec
-    
-        # Draw internal ray
-        ax.plot([entry_point[0], exit_point[0]],
-                [entry_point[1], exit_point[1]],
-                color='#1E3A8A', linewidth=2, alpha=0.7, zorder=4)
-    
+            exit_x, exit_y = ray_x[-1], ray_y[-1]
+        
+        # Gambar sinar dalam prisma (biru gelap, tunggal)
+        ax.plot([entry_x, exit_x], [entry_y, exit_y], 
+                color='#1E3A8A', linewidth=2, alpha=0.8, zorder=4)
+        
         # ========================================
-        # OUTGOING RAYS (spectrum)
+        # EMERGENT RAYS - Spectrum (hanya di luar kanan)
         # ========================================
-        exit_points_data = []
-    
+        exit_data = []
+        
         for i, res in enumerate(results):
             if not show_spectrum and i not in [0, len(results)//2, len(results)-1]:
                 continue
-    
+            
             n_wl = res['n']
-    
-            # Angle of incidence inside prism at exit (relative to inward normal)
-            cos_i2 = np.dot(internal_dir, right_inward_normal)
-            cos_i2 = np.clip(cos_i2, -1.0, 1.0)
-            sin_i2 = np.sqrt(1 - cos_i2**2)
-    
-            # Snell: n * sin_i2 = 1 * sin_i2_out
-            sin_i2_out = n_wl * sin_i2
-            if sin_i2_out > 1.0:
-                # total internal reflection – skip this wavelength
+            i2 = np.radians(res['i2'])
+            
+            # Snell di keluar
+            sin_out = n_wl * np.sin(i2)
+            if sin_out > 1:
                 continue
-            cos_i2_out = np.sqrt(1 - sin_i2_out**2)
-    
-            # Refracted direction (air) using outward normal
-            outgoing_dir = n_wl * internal_dir + (n_wl * cos_i2 - cos_i2_out) * outward_normal_right
-            outgoing_dir = outgoing_dir / np.linalg.norm(outgoing_dir)
-    
-            final_point = exit_point + 4.5 * outgoing_dir
-    
-            exit_points_data.append({
-                'exit_x': exit_point[0],
-                'exit_y': exit_point[1],
-                'final_exit_x': final_point[0],
-                'final_exit_y': final_point[1],
-                'emergent_ray_angle': np.arctan2(outgoing_dir[1], outgoing_dir[0]),
-                'i2_rad': np.arcsin(sin_i2),   # i2 inside prism
+                
+            r2 = np.arcsin(sin_out)
+            emergent_angle = right_normal_angle - r2
+            emergent_dir = np.array([np.cos(emergent_angle), np.sin(emergent_angle)])
+            
+            final_x = exit_x + 4.5 * emergent_dir[0]
+            final_y = exit_y + 4.5 * emergent_dir[1]
+            
+            exit_data.append({
+                'exit_x': exit_x, 'exit_y': exit_y,
+                'final_x': final_x, 'final_y': final_y,
+                'emergent_dir': emergent_dir,
                 'color': res['color'] if show_spectrum else 'k',
                 'label': res['warna'] if show_spectrum and i < 3 else "",
                 'delta': res['delta']
             })
-    
-            ax.plot([exit_point[0], final_point[0]],
-                    [exit_point[1], final_point[1]],
+            
+            # Gambar sinar keluar (spektrum warna)
+            ax.plot([exit_x, final_x], [exit_y, final_y],
                     color=res['color'] if show_spectrum else 'k',
                     linewidth=2.5, alpha=0.9,
                     label=res['warna'] if show_spectrum and i < 3 else "", zorder=5)
-    
-            # Backward extension line for deviation (dotted)
-            backward_start = exit_point - 2.5 * outgoing_dir
-            ax.plot([exit_point[0], backward_start[0]],
-                    [exit_point[1], backward_start[1]],
+            
+            # Perpanjangan ke belakang
+            back_x = exit_x - 2 * emergent_dir[0]
+            back_y = exit_y - 2 * emergent_dir[1]
+            ax.plot([exit_x, back_x], [exit_y, back_y],
                     color=res['color'] if show_spectrum else 'k',
-                    linewidth=0.5, alpha=0.25, linestyle=':', zorder=1)
-    
-        # Draw normal lines at entry and exit
-        normal_len = 1.3
-        ax.plot([entry_point[0] - normal_len * left_inward_normal[0],
-                 entry_point[0] + normal_len * left_inward_normal[0]],
-                [entry_point[1] - normal_len * left_inward_normal[1],
-                 entry_point[1] + normal_len * left_inward_normal[1]],
-                'k--', linewidth=1, alpha=0.5, zorder=2)
-        ax.plot([exit_point[0] - normal_len * right_inward_normal[0],
-                 exit_point[0] + normal_len * right_inward_normal[0]],
-                [exit_point[1] - normal_len * right_inward_normal[1],
-                 exit_point[1] + normal_len * right_inward_normal[1]],
-                'k--', linewidth=1, alpha=0.5, zorder=2)
-    
+                    linewidth=0.5, alpha=0.3, linestyle=':', zorder=1)
+        
         # ========================================
-        # ANGLE LABELS (using pre‑computed physics angles)
+        # NORMAL LINES (dashed)
         # ========================================
-        if show_angles and results:
-            result = results[0]   # use red data for reference
-            arc_radius = 0.45
-    
-            # i₁ – angle between incident ray and outward normal (left side)
-            start_angle = np.arctan2(outward_normal_left[1], outward_normal_left[0])
-            end_angle = np.arctan2(incident_dir[1], incident_dir[0])
-            while end_angle - start_angle > np.pi:
-                end_angle -= 2*np.pi
-            while end_angle - start_angle < -np.pi:
-                end_angle += 2*np.pi
-            arc_angles = np.linspace(start_angle, end_angle, 50)
-            arc_x = entry_point[0] + arc_radius * np.cos(arc_angles)
-            arc_y = entry_point[1] + arc_radius * np.sin(arc_angles)
-            ax.plot(arc_x, arc_y, 'k-', linewidth=1.8, zorder=6)
-            mid_angle = (start_angle + end_angle) / 2
-            ax.text(entry_point[0] + (arc_radius+0.15)*np.cos(mid_angle),
-                    entry_point[1] + (arc_radius+0.15)*np.sin(mid_angle),
-                    'i₁', fontsize=12, fontweight='bold', color='black',
-                    ha='center', va='center', zorder=7)
-    
-            # r₁ – inside prism at entry (between internal_dir and inward normal)
-            start_angle = np.arctan2(left_inward_normal[1], left_inward_normal[0])
-            end_angle = np.arctan2(internal_dir[1], internal_dir[0])
-            while end_angle - start_angle > np.pi:
-                end_angle -= 2*np.pi
-            while end_angle - start_angle < -np.pi:
-                end_angle += 2*np.pi
-            arc_angles = np.linspace(start_angle, end_angle, 50)
-            arc_x = entry_point[0] + (arc_radius*0.55) * np.cos(arc_angles)
-            arc_y = entry_point[1] + (arc_radius*0.55) * np.sin(arc_angles)
-            ax.plot(arc_x, arc_y, 'k-', linewidth=1.8, zorder=6)
-            mid_angle = (start_angle + end_angle) / 2
-            ax.text(entry_point[0] + (arc_radius*0.55+0.12)*np.cos(mid_angle),
-                    entry_point[1] + (arc_radius*0.55+0.12)*np.sin(mid_angle),
-                    'r₁', fontsize=11, fontweight='bold', color='black',
-                    ha='center', va='center', zorder=7)
-    
-            # i₂ – inside prism at exit (between internal_dir and inward normal)
-            if exit_points_data:
-                # Use the first outgoing ray for label (all have same i₂)
-                i2_rad = exit_points_data[0]['i2_rad']
-                start_angle = np.arctan2(right_inward_normal[1], right_inward_normal[0])
-                end_angle = np.arctan2(internal_dir[1], internal_dir[0])
-                while end_angle - start_angle > np.pi:
-                    end_angle -= 2*np.pi
-                while end_angle - start_angle < -np.pi:
-                    end_angle += 2*np.pi
-                arc_angles = np.linspace(start_angle, end_angle, 50)
-                arc_x = exit_point[0] + (arc_radius*0.55) * np.cos(arc_angles)
-                arc_y = exit_point[1] + (arc_radius*0.55) * np.sin(arc_angles)
-                ax.plot(arc_x, arc_y, 'k-', linewidth=1.8, zorder=6)
-                mid_angle = (start_angle + end_angle) / 2
-                ax.text(exit_point[0] + (arc_radius*0.55+0.12)*np.cos(mid_angle),
-                        exit_point[1] + (arc_radius*0.55+0.12)*np.sin(mid_angle),
-                        'i₂', fontsize=11, fontweight='bold', color='black',
-                        ha='center', va='center', zorder=7)
-    
-            # Prism angle A (at apex)
-            left_side_angle = np.arctan2(base_y - apex_y, base_left_x - apex_x)
-            right_side_angle = np.arctan2(base_y - apex_y, base_right_x - apex_x)
-            apex_arc_radius = 0.7
-            arc_angles = np.linspace(right_side_angle, left_side_angle, 50)
-            arc_x = apex_x + apex_arc_radius * np.cos(arc_angles)
-            arc_y = apex_y + apex_arc_radius * np.sin(arc_angles)
-            ax.plot(arc_x, arc_y, 'k-', linewidth=1.8, zorder=6)
-            ax.text(apex_x, apex_y - apex_arc_radius - 0.2,
-                    f'A = {prism_angle:.1f}°', fontsize=11, fontweight='bold',
-                    color='black', ha='center', va='top', zorder=7)
-    
-            # Deviation angle δ
-            if exit_points_data:
-                # Use the first outgoing ray for δ label (red)
-                outgoing_dir_first = None
-                for data in exit_points_data:
-                    if data['color'] == results[0]['color']:
-                        outgoing_dir_first = np.array([data['final_exit_x'] - data['exit_x'],
-                                                       data['final_exit_y'] - data['exit_y']])
-                        outgoing_dir_first = outgoing_dir_first / np.linalg.norm(outgoing_dir_first)
-                        break
-                if outgoing_dir_first is not None:
-                    angle1 = np.arctan2(incident_dir[1], incident_dir[0])
-                    angle2 = np.arctan2(-outgoing_dir_first[1], -outgoing_dir_first[0])
-                    while angle2 - angle1 > np.pi:
-                        angle2 -= 2*np.pi
-                    while angle2 - angle1 < -np.pi:
-                        angle2 += 2*np.pi
-                    dev_center_x = exit_point[0] + 1.0
-                    dev_center_y = exit_point[1] + 2.0
-                    dev_arc_radius = 3.5
-                    arc_angles = np.linspace(angle1, angle2, 50)
-                    arc_x = dev_center_x + dev_arc_radius * np.cos(arc_angles)
-                    arc_y = dev_center_y + dev_arc_radius * np.sin(arc_angles)
-                    ax.plot(arc_x, arc_y, 'k--', linewidth=1.8, zorder=6)
-                    mid_angle = (angle1 + angle2) / 2
-                    ax.text(dev_center_x + (dev_arc_radius+0.4)*np.cos(mid_angle),
-                            dev_center_y + (dev_arc_radius+0.4)*np.sin(mid_angle),
-                            f'δ = {exit_points_data[0]["delta"]:.1f}°',
-                            fontsize=11, fontweight='bold', color='black',
-                            ha='center', va='center', zorder=7)
-    
-        # Set limits
-        ax.set_xlim(-7.5, 7.5)
-        ax.set_ylim(-2.5, 6)
+        normal_len = 1.2
+        # Normal di entry
+        ax.plot([entry_x - normal_len*np.cos(left_normal_angle), 
+                 entry_x + normal_len*np.cos(left_normal_angle)],
+                [entry_y - normal_len*np.sin(left_normal_angle), 
+                 entry_y + normal_len*np.sin(left_normal_angle)],
+                'k--', linewidth=1, alpha=0.5, zorder=2)
+        
+        # Normal di exit
+        ax.plot([exit_x - normal_len*np.cos(right_normal_angle), 
+                 exit_x + normal_len*np.cos(right_normal_angle)],
+                [exit_y - normal_len*np.sin(right_normal_angle), 
+                 exit_y + normal_len*np.sin(right_normal_angle)],
+                'k--', linewidth=1, alpha=0.5, zorder=2)
+        
+        # ========================================
+        # ANGLE LABELS (semua HITAM)
+        # ========================================
+        if show_angles:
+            arc_r = 0.4
+            
+            # i₁ - di LUAR (kiri)
+            start = incident_angle_global
+            end = left_normal_angle
+            while abs(end - start) > np.pi:
+                end -= 2*np.pi if end > start else 0
+                start -= 2*np.pi if start > end else 0
+            
+            arc = np.linspace(start, end, 50)
+            ax.plot(entry_x + arc_r*np.cos(arc), entry_y + arc_r*np.sin(arc), 'k-', lw=1.8, zorder=6)
+            mid = (start + end)/2
+            ax.text(entry_x + (arc_r+0.12)*np.cos(mid), entry_y + (arc_r+0.12)*np.sin(mid),
+                    'i₁', fontsize=12, fontweight='bold', color='black', ha='center', va='center', zorder=7)
+            
+            # r₁ - di DALAM (kiri)
+            start = internal_angle
+            end = left_normal_angle
+            while abs(end - start) > np.pi:
+                end -= 2*np.pi if end > start else 0
+                start -= 2*np.pi if start > end else 0
+            
+            arc = np.linspace(start, end, 50)
+            ax.plot(entry_x + arc_r*0.6*np.cos(arc), entry_y + arc_r*0.6*np.sin(arc), 'k-', lw=1.8, zorder=6)
+            mid = (start + end)/2
+            ax.text(entry_x + (arc_r*0.6+0.1)*np.cos(mid), entry_y + (arc_r*0.6+0.1)*np.sin(mid),
+                    'r₁', fontsize=11, fontweight='bold', color='black', ha='center', va='center', zorder=7)
+            
+            # i₂ - di DALAM (kanan)
+            if exit_data:
+                internal_exit = np.arctan2(internal_dir[1], internal_dir[0])
+                right_normal_in = right_normal_angle + np.pi
+                
+                start = internal_exit
+                end = right_normal_in
+                while abs(end - start) > np.pi:
+                    end -= 2*np.pi if end > start else 0
+                    start -= 2*np.pi if start > end else 0
+                
+                arc = np.linspace(start, end, 50)
+                ax.plot(exit_x + arc_r*0.6*np.cos(arc), exit_y + arc_r*0.6*np.sin(arc), 'k-', lw=1.8, zorder=6)
+                mid = (start + end)/2
+                ax.text(exit_x + (arc_r*0.6+0.1)*np.cos(mid), exit_y + (arc_r*0.6+0.1)*np.sin(mid),
+                        'i₂', fontsize=11, fontweight='bold', color='black', ha='center', va='center', zorder=7)
+            
+            # Sudut A (apex)
+            left_side = np.arctan2(base_y - apex_y, base_left_x - apex_x)
+            right_side = np.arctan2(base_y - apex_y, base_right_x - apex_x)
+            arc = np.linspace(right_side, left_side, 50)
+            ax.plot(apex_x + 0.65*np.cos(arc), apex_y + 0.65*np.sin(arc), 'k-', lw=1.8, zorder=6)
+            ax.text(apex_x, apex_y - 0.9, f'A = {prism_angle:.1f}°', fontsize=11, 
+                    fontweight='bold', color='black', ha='center', va='top', zorder=7)
+            
+            # Sudut deviasi δ
+            if exit_data:
+                inc_ext = incident_angle_global + np.pi
+                emerg = np.arctan2(exit_data[0]['emergent_dir'][1], exit_data[0]['emergent_dir'][0])
+                
+                a1, a2 = inc_ext, emerg
+                while a1 > np.pi: a1 -= 2*np.pi
+                while a2 > np.pi: a2 -= 2*np.pi
+                while a1 < -np.pi: a1 += 2*np.pi
+                while a2 < -np.pi: a2 += 2*np.pi
+                
+                start, end = min(a1, a2), max(a1, a2)
+                cx, cy = exit_x + 0.8, exit_y + 1.5
+                arc = np.linspace(start, end, 50)
+                ax.plot(cx + 3.2*np.cos(arc), cy + 3.2*np.sin(arc), 'k--', lw=1.8, zorder=6)
+                mid = (start + end)/2
+                ax.text(cx + (3.2+0.35)*np.cos(mid), cy + (3.2+0.35)*np.sin(mid),
+                        f'δ = {exit_data[0]["delta"]:.1f}°', fontsize=11,
+                        fontweight='bold', color='black', ha='center', va='center', zorder=7)
+        
+        ax.set_xlim(-7, 7)
+        ax.set_ylim(-1, 6.5)
         ax.set_aspect('equal')
         ax.axis('off')
-    
+        
         if show_spectrum:
             ax.legend(loc='upper left', fontsize=9, framealpha=0.9, facecolor='white')
-    
+        
         plt.tight_layout()
         return fig
         
