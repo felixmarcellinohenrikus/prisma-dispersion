@@ -555,3 +555,4 @@ Fisika Optik | Pendidikan Sains | Streamlit Dashboard
 st.markdown("""
 <details>
 <summary>📦 <strong>requirements.txt</strong> (Klik untuk melihat dependensi)</summary>
+""", unsafe_allow_html=True)
