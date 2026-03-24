@@ -312,8 +312,8 @@ if results:
         
         incident_len = 4.0
         # Sinar datang: dari incident_start MENUJU entry point
-        incident_start_x = entry_x - incident_len * np.sin(incident_ray_angle)
-        incident_start_y = entry_y - incident_len * np.cos(incident_ray_angle)
+        incident_start_x = entry_x - incident_len * np.cos(incident_ray_angle)
+        incident_start_y = entry_y - incident_len * np.sin(incident_ray_angle)
         
         # Draw incident ray (BLACK, SOLID) - datang dari kiri
         ax.plot([incident_start_x, entry_x], [incident_start_y, entry_y],
