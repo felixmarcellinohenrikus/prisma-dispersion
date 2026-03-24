@@ -265,9 +265,9 @@ st.markdown("### 🔍 Visualisasi Ray Tracing")
 
 if results:
     def create_ray_tracing_plot(incident_angle, prism_angle, results, show_spectrum, show_angles):
-    fig, ax = plt.subplots(figsize=(12, 8), dpi=100)
-    fig.patch.set_facecolor('#f8f9fa')
-    ax.set_facecolor('#ffffff')
+        fig, ax = plt.subplots(figsize=(12, 8), dpi=100)
+        fig.patch.set_facecolor('#f8f9fa')
+        ax.set_facecolor('#ffffff')
 
     # ========================================
     # DYNAMIC PRISM GEOMETRY (isosceles triangle)
