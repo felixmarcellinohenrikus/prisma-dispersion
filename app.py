@@ -578,7 +578,7 @@ def create_ray_tracing_plot(incident_angle, prism_angle, results, show_spectrum,
 
     plt.tight_layout()
     return fig
-    
+if
     fig = create_ray_tracing_plot(incident_angle, prism_angle, results, show_spectrum, show_angles)
     st.pyplot(fig)
     plt.close(fig)
