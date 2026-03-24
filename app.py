@@ -426,7 +426,7 @@ if results:
             arc_r = 0.35
             
             # i₁ - OUTSIDE (antara sinar datang dan normal)
-            start_i1 = incident_ray_angle
+            start_i1 = np.pi - incident_ray_angle
             end_i1 = normal_left_angle
             
             # Sesuaikan agar busur < 180°
