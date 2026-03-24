@@ -1,5 +1,7 @@
 import streamlit as st
 import numpy as np
+import matplotlib
+matplotlib.use('Agg')  # Wajib untuk Streamlit Cloud
 import matplotlib.pyplot as plt
 from matplotlib.patches import Polygon
 import warnings
@@ -15,17 +17,45 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
+# Custom CSS untuk styling
+st.markdown("""
+<style>
+    .main-header {
+        text-align: center;
+        padding: 20px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 10px;
+        margin-bottom: 30px;
+        color: white;
+    }
+    .info-box {
+        background: #e8f4f8;
+        padding: 15px;
+        border-radius: 8px;
+        border-left: 5px solid #667eea;
+        margin: 10px 0;
+    }
+    .footer {
+        text-align: center;
+        padding: 20px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 10px;
+        color: white;
+        margin-top: 30px;
+    }
+</style>
+""", unsafe_allow_html=True)
+
 # ============================================================================
 # HEADER & INFORMASI PENGEMBANG
 # ============================================================================
 st.markdown("""
-    <div style='text-align: center; padding: 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
-                border-radius: 10px; margin-bottom: 30px;'>
-        <h1 style='color: white; margin: 0;'>🔬 Simulasi Dispersi Cahaya pada Prisma</h1>
-        <p style='color: #f0f0f0; margin: 10px 0 0 0; font-size: 16px;'>
-            Dikembangkan oleh <strong>Felix Marcellino Henrikus</strong>
-        </p>
-    </div>
+<div class="main-header">
+    <h1 style='margin: 0;'>🔬 Simulasi Dispersi Cahaya pada Prisma</h1>
+    <p style='margin: 10px 0 0 0; font-size: 16px;'>
+        Dikembangkan oleh <strong>Felix Marcellino Henrikus</strong>
+    </p>
+</div>
 """, unsafe_allow_html=True)
 
 # ============================================================================
@@ -179,24 +209,21 @@ if results:
     
     with col1:
         st.metric(
-            " Sudut Deviasi (Merah)",
-            f"{results[0]['delta']:.2f}°",
-            delta=f"{results[0]['delta'] - 40:.2f}°"
+            "🔴 Sudut Deviasi (Merah)",
+            f"{results[0]['delta']:.2f}°"
         )
     
     with col2:
         mid_idx = len(results) // 2
         st.metric(
             "🟢 Sudut Deviasi (Hijau)",
-            f"{results[mid_idx]['delta']:.2f}°",
-            delta=f"{results[mid_idx]['delta'] - 40:.2f}°"
+            f"{results[mid_idx]['delta']:.2f}°"
         )
     
     with col3:
         st.metric(
             "🟣 Sudut Deviasi (Ungu)",
-            f"{results[-1]['delta']:.2f}°",
-            delta=f"{results[-1]['delta'] - 40:.2f}°"
+            f"{results[-1]['delta']:.2f}°"
         )
     
     delta_range = results[-1]['delta'] - results[0]['delta']
@@ -210,141 +237,142 @@ else:
 st.markdown("---")
 st.markdown("### 🔍 Visualisasi Ray Tracing")
 
-fig, ax = plt.subplots(figsize=(14, 8))
-fig.patch.set_facecolor('#f8f9fa')
-ax.set_facecolor('#ffffff')
-
-prism_size = 5
-apex_x = 0
-apex_y = prism_size * np.sqrt(3) / 2
-base_left_x = -prism_size / 2
-base_left_y = 0
-base_right_x = prism_size / 2
-base_right_y = 0
-
-prism_vertices = np.array([
-    [apex_x, apex_y],
-    [base_left_x, base_left_y],
-    [base_right_x, base_right_y]
-])
-
-prism_patch = Polygon(prism_vertices, closed=True, 
-                      fill=True, alpha=0.3, 
-                      edgecolor='#2c3e50', linewidth=2,
-                      facecolor='#3498db')
-ax.add_patch(prism_patch)
-
-A_rad = np.radians(prism_angle)
-left_surface_angle = np.pi/2 - A_rad/2
-right_surface_angle = np.pi/2 + A_rad/2
-
-entry_point_x = -prism_size/4
-entry_point_y = apex_y * 0.6
-
-i1_rad = np.radians(incident_angle)
-normal_left_angle = left_surface_angle + np.pi/2
-incident_ray_angle = normal_left_angle - i1_rad - np.pi
-
-incident_length = 4
-incident_start_x = entry_point_x + incident_length * np.cos(incident_ray_angle)
-incident_start_y = entry_point_y + incident_length * np.sin(incident_ray_angle)
-
-ax.plot([incident_start_x, entry_point_x], 
-        [incident_start_y, entry_point_y], 
-        'k-', linewidth=2, label='Sinar Datang', zorder=5)
-
-ax.plot([entry_point_x, entry_point_x + 0.5*np.cos(normal_left_angle)],
-        [entry_point_y, entry_point_y + 0.5*np.sin(normal_left_angle)],
-        'k--', linewidth=1, alpha=0.5)
-
-for i, result in enumerate(results):
-    if not show_spectrum and i not in [0, len(results)//2, len(results)-1]:
-        continue
+def create_ray_tracing_plot(incident_angle, prism_angle, results, show_spectrum, show_angles):
+    """Membuat plot ray tracing yang kompatibel dengan Streamlit Cloud"""
     
-    n = result['n']
-    r1_rad = np.radians(result['r1'])
-    r2_rad = np.radians(result['r2'])
-    i2_rad = np.radians(result['i2'])
+    fig, ax = plt.subplots(figsize=(14, 8), dpi=100)
+    fig.patch.set_facecolor('#f8f9fa')
+    ax.set_facecolor('#ffffff')
     
-    internal_angle = normal_left_angle - r1_rad - np.pi
-    internal_length = prism_size * 0.8
-    internal_end_x = entry_point_x + internal_length * np.cos(internal_angle)
-    internal_end_y = entry_point_y + internal_length * np.sin(internal_angle)
+    prism_size = 5
+    apex_x = 0
+    apex_y = prism_size * np.sqrt(3) / 2
+    base_left_x = -prism_size / 2
+    base_left_y = 0
+    base_right_x = prism_size / 2
+    base_right_y = 0
     
-    if show_spectrum:
-        ax.plot([entry_point_x, internal_end_x],
-                [entry_point_y, internal_end_y],
-                color=result['color'], linewidth=1.5, alpha=0.7)
-    else:
-        ax.plot([entry_point_x, internal_end_x],
-                [entry_point_y, internal_end_y],
-                'r-', linewidth=1.5, alpha=0.7)
+    prism_vertices = np.array([
+        [apex_x, apex_y],
+        [base_left_x, base_left_y],
+        [base_right_x, base_right_y]
+    ])
     
-    normal_right_angle = right_surface_angle - np.pi/2
-    exit_ray_angle = normal_right_angle - i2_rad
+    prism_patch = Polygon(prism_vertices, closed=True, 
+                          fill=True, alpha=0.3, 
+                          edgecolor='#2c3e50', linewidth=2,
+                          facecolor='#3498db')
+    ax.add_patch(prism_patch)
     
-    exit_length = 5
-    exit_end_x = internal_end_x + exit_length * np.cos(exit_ray_angle)
-    exit_end_y = internal_end_y + exit_length * np.sin(exit_ray_angle)
+    A_rad = np.radians(prism_angle)
+    left_surface_angle = np.pi/2 - A_rad/2
+    right_surface_angle = np.pi/2 + A_rad/2
     
-    if show_spectrum:
-        ax.plot([internal_end_x, exit_end_x],
-                [internal_end_y, exit_end_y],
-                color=result['color'], linewidth=2, alpha=0.9,
-                label=f"{result['warna']}" if i < 3 else "")
-    else:
-        ax.plot([internal_end_x, exit_end_x],
-                [internal_end_y, exit_end_y],
-                'r-', linewidth=2)
+    entry_point_x = -prism_size/4
+    entry_point_y = apex_y * 0.6
     
-    ax.plot([internal_end_x, internal_end_x + 0.5*np.cos(normal_right_angle)],
-            [internal_end_y, internal_end_y + 0.5*np.sin(normal_right_angle)],
+    i1_rad = np.radians(incident_angle)
+    normal_left_angle = left_surface_angle + np.pi/2
+    incident_ray_angle = normal_left_angle - i1_rad - np.pi
+    
+    incident_length = 4
+    incident_start_x = entry_point_x + incident_length * np.cos(incident_ray_angle)
+    incident_start_y = entry_point_y + incident_length * np.sin(incident_ray_angle)
+    
+    ax.plot([incident_start_x, entry_point_x], 
+            [incident_start_y, entry_point_y], 
+            'k-', linewidth=2, label='Sinar Datang', zorder=5)
+    
+    ax.plot([entry_point_x, entry_point_x + 0.5*np.cos(normal_left_angle)],
+            [entry_point_y, entry_point_y + 0.5*np.sin(normal_left_angle)],
             'k--', linewidth=1, alpha=0.5)
-
-ax.plot([incident_start_x, incident_start_x + 2],
-        [incident_start_y, incident_start_y],
-        'k-', linewidth=1)
-
-extended_exit_start_x = exit_end_x - 3 * np.cos(exit_ray_angle)
-extended_exit_start_y = exit_end_y - 3 * np.sin(exit_ray_angle)
-ax.plot([extended_exit_start_x, exit_end_x + 1],
-        [extended_exit_start_y, exit_end_y + 1],
-        'k:', linewidth=1, alpha=0.5)
-
-if show_angles:
-    arc_radius = 0.8
-    arc_angles = np.linspace(incident_ray_angle, normal_left_angle, 50)
-    arc_x = entry_point_x + arc_radius * np.cos(arc_angles)
-    arc_y = entry_point_y + arc_radius * np.sin(arc_angles)
-    ax.plot(arc_x, arc_y, 'b-', linewidth=1.5)
-    ax.text(entry_point_x + 0.9, entry_point_y + 0.3, 'i₁', fontsize=12, 
-            fontweight='bold', color='blue')
     
-    arc_angles = np.linspace(normal_left_angle - np.pi, internal_angle, 50)
-    arc_x = entry_point_x + arc_radius * 0.7 * np.cos(arc_angles)
-    arc_y = entry_point_y + arc_radius * 0.7 * np.sin(arc_angles)
-    ax.plot(arc_x, arc_y, 'g-', linewidth=1.5)
-    ax.text(entry_point_x + 0.3, entry_point_y - 0.5, 'r₁', fontsize=12,
-            fontweight='bold', color='green')
+    for i, result in enumerate(results):
+        if not show_spectrum and i not in [0, len(results)//2, len(results)-1]:
+            continue
+        
+        n = result['n']
+        r1_rad = np.radians(result['r1'])
+        r2_rad = np.radians(result['r2'])
+        i2_rad = np.radians(result['i2'])
+        
+        internal_angle = normal_left_angle - r1_rad - np.pi
+        internal_length = prism_size * 0.8
+        internal_end_x = entry_point_x + internal_length * np.cos(internal_angle)
+        internal_end_y = entry_point_y + internal_length * np.sin(internal_angle)
+        
+        if show_spectrum:
+            ax.plot([entry_point_x, internal_end_x],
+                    [entry_point_y, internal_end_y],
+                    color=result['color'], linewidth=1.5, alpha=0.7)
+        else:
+            ax.plot([entry_point_x, internal_end_x],
+                    [entry_point_y, internal_end_y],
+                    'r-', linewidth=1.5, alpha=0.7)
+        
+        normal_right_angle = right_surface_angle - np.pi/2
+        exit_ray_angle = normal_right_angle - i2_rad
+        
+        exit_length = 5
+        exit_end_x = internal_end_x + exit_length * np.cos(exit_ray_angle)
+        exit_end_y = internal_end_y + exit_length * np.sin(exit_ray_angle)
+        
+        if show_spectrum:
+            ax.plot([internal_end_x, exit_end_x],
+                    [internal_end_y, exit_end_y],
+                    color=result['color'], linewidth=2, alpha=0.9,
+                    label=f"{result['warna']}" if i < 3 else "")
+        else:
+            ax.plot([internal_end_x, exit_end_x],
+                    [internal_end_y, exit_end_y],
+                    'r-', linewidth=2)
+        
+        ax.plot([internal_end_x, internal_end_x + 0.5*np.cos(normal_right_angle)],
+                [internal_end_y, internal_end_y + 0.5*np.sin(normal_right_angle)],
+                'k--', linewidth=1, alpha=0.5)
     
-    arc_angles = np.linspace(normal_right_angle - np.pi, exit_ray_angle, 50)
-    arc_x = internal_end_x + arc_radius * 0.7 * np.cos(arc_angles)
-    arc_y = internal_end_y + arc_radius * 0.7 * np.sin(arc_angles)
-    ax.plot(arc_x, arc_y, 'm-', linewidth=1.5)
-    ax.text(internal_end_x + 0.3, internal_end_y - 0.5, 'i₂', fontsize=12,
-            fontweight='bold', color='magenta')
+    if show_angles:
+        arc_radius = 0.8
+        arc_angles = np.linspace(incident_ray_angle, normal_left_angle, 50)
+        arc_x = entry_point_x + arc_radius * np.cos(arc_angles)
+        arc_y = entry_point_y + arc_radius * np.sin(arc_angles)
+        ax.plot(arc_x, arc_y, 'b-', linewidth=1.5)
+        ax.text(entry_point_x + 0.9, entry_point_y + 0.3, 'i₁', fontsize=12, 
+                fontweight='bold', color='blue')
+        
+        arc_angles = np.linspace(normal_left_angle - np.pi, internal_angle, 50)
+        arc_x = entry_point_x + arc_radius * 0.7 * np.cos(arc_angles)
+        arc_y = entry_point_y + arc_radius * 0.7 * np.sin(arc_angles)
+        ax.plot(arc_x, arc_y, 'g-', linewidth=1.5)
+        ax.text(entry_point_x + 0.3, entry_point_y - 0.5, 'r₁', fontsize=12,
+                fontweight='bold', color='green')
+        
+        arc_angles = np.linspace(normal_right_angle - np.pi, exit_ray_angle, 50)
+        arc_x = internal_end_x + arc_radius * 0.7 * np.cos(arc_angles)
+        arc_y = internal_end_y + arc_radius * 0.7 * np.sin(arc_angles)
+        ax.plot(arc_x, arc_y, 'm-', linewidth=1.5)
+        ax.text(internal_end_x + 0.3, internal_end_y - 0.5, 'i₂', fontsize=12,
+                fontweight='bold', color='magenta')
+    
+    ax.set_xlim(-8, 8)
+    ax.set_ylim(-2, 8)
+    ax.set_aspect('equal')
+    ax.axis('off')
+    
+    if show_spectrum:
+        ax.legend(loc='upper right', fontsize=10, framealpha=0.9)
+    
+    plt.tight_layout()
+    
+    return fig
 
-ax.set_xlim(-8, 8)
-ax.set_ylim(-2, 8)
-ax.set_aspect('equal')
-ax.axis('off')
-
-if show_spectrum:
-    ax.legend(loc='upper right', fontsize=10, framealpha=0.9)
-
-plt.tight_layout()
-st.pyplot(fig)
-plt.close()
+# Render plot
+if results:
+    fig = create_ray_tracing_plot(incident_angle, prism_angle, results, show_spectrum, show_angles)
+    st.pyplot(fig)
+    plt.close(fig)  # Penting untuk mencegah memory leak
+else:
+    st.warning("⚠️ Tidak ada data untuk ditampilkan")
 
 # ============================================================================
 # FORMULASI MATEMATIS
@@ -353,7 +381,7 @@ st.markdown("---")
 st.markdown("### 📐 Formulasi Matematis")
 
 st.markdown("""
-<div style='background: #f8f9fa; padding: 20px; border-radius: 10px; border-left: 5px solid #667eea;'>
+<div class="info-box">
 
 #### 1. Hukum Snellius (Pembiasan)
 
@@ -427,10 +455,7 @@ if results:
     df_display['Sudut Deviasi (°)'] = df_display['Sudut Deviasi (°)'].round(2)
     
     st.dataframe(
-        df_display.style.background_gradient(
-            subset=['Sudut Deviasi (°)'], 
-            cmap='RdYlBu_r'
-        ),
+        df_display,
         use_container_width=True,
         hide_index=True
     )
@@ -445,7 +470,7 @@ wavelength_range = np.linspace(380, 750, 100)
 n_cauchy = [cauchy_equation(wl) for wl in wavelength_range]
 n_sellmeier = [sellmeier_equation(wl) for wl in wavelength_range]
 
-fig2, ax2 = plt.subplots(figsize=(12, 6))
+fig2, ax2 = plt.subplots(figsize=(12, 6), dpi=100)
 fig2.patch.set_facecolor('#f8f9fa')
 ax2.set_facecolor('#ffffff')
 
@@ -472,10 +497,10 @@ ax2.set_xlim(350, 780)
 
 plt.tight_layout()
 st.pyplot(fig2)
-plt.close()
+plt.close(fig2)
 
 st.markdown("""
-<div style='background: #e8f4f8; padding: 15px; border-radius: 8px; margin-top: 15px;'>
+<div class="info-box">
 
 **📝 Penjelasan:**
 
@@ -505,7 +530,7 @@ for i1 in incident_angles:
     delta_red.append(d_r if d_r else np.nan)
     delta_violet.append(d_v if d_v else np.nan)
 
-fig3, ax3 = plt.subplots(figsize=(12, 6))
+fig3, ax3 = plt.subplots(figsize=(12, 6), dpi=100)
 fig3.patch.set_facecolor('#f8f9fa')
 ax3.set_facecolor('#ffffff')
 
@@ -530,29 +555,16 @@ ax3.grid(True, alpha=0.3, linestyle='--')
 
 plt.tight_layout()
 st.pyplot(fig3)
-plt.close()
+plt.close(fig3)
 
 # ============================================================================
 # FOOTER
 # ============================================================================
 st.markdown("---")
 st.markdown("""
-<div style='text-align: center; padding: 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
-            border-radius: 10px; color: white;'>
-
-**🔬 Simulasi Dispersi Cahaya pada Prisma**
-
-*Dikembangkan oleh Felix Marcellino Henrikus*
-
-Fisika Optik | Pendidikan Sains | Streamlit Dashboard
-
+<div class="footer">
+    <h4>🔬 Simulasi Dispersi Cahaya pada Prisma</h4>
+    <p><em>Dikembangkan oleh Felix Marcellino Henrikus</em></p>
+    <p>Fisika Optik | Pendidikan Sains | Streamlit Dashboard</p>
 </div>
-""", unsafe_allow_html=True)
-
-# ============================================================================
-# REQUIREMENTS.TXT CONTENT (untuk referensi)
-# ============================================================================
-st.markdown("""
-<details>
-<summary>📦 <strong>requirements.txt</strong> (Klik untuk melihat dependensi)</summary>
 """, unsafe_allow_html=True)
