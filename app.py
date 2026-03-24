@@ -265,9 +265,9 @@ st.markdown("### 🔍 Visualisasi Ray Tracing")
 
 if results:
     def create_ray_tracing_plot(incident_angle, prism_angle, results, show_spectrum, show_angles):
-        fig, ax = plt.subplots(figsize=(12, 8), dpi=100)
-        fig.patch.set_facecolor('#f8f9fa')
-        ax.set_facecolor('#ffffff')
+    fig, ax = plt.subplots(figsize=(12, 8), dpi=100)
+    fig.patch.set_facecolor('#f8f9fa')
+    ax.set_facecolor('#ffffff')
 
     # ========================================
     # DYNAMIC PRISM GEOMETRY (isosceles triangle)
@@ -350,7 +350,6 @@ if results:
     if sin_r1 > 1.0:
         st.warning("Total internal reflection at entry – cannot draw internal ray.")
         return fig
-    
     cos_r1 = np.sqrt(1 - sin_r1**2)
     # Refracted direction (inside prism)
     internal_dir = (1/ref_n) * incident_dir + ((1/ref_n)*cos_i1 - cos_r1) * left_inward_normal
@@ -510,7 +509,6 @@ if results:
                     ha='center', va='center', zorder=7)
 
         # Prism angle A (at apex)
-        # FIX: Use base_y instead of base_left_y / base_right_y
         left_side_angle = np.arctan2(base_y - apex_y, base_left_x - apex_x)
         right_side_angle = np.arctan2(base_y - apex_y, base_right_x - apex_x)
         apex_arc_radius = 0.7
