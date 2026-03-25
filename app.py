@@ -397,38 +397,85 @@ if results:
     st.dataframe(df_display, use_container_width=True, hide_index=True)
 
 # ============================================================================
-# GRAFIK: CAUCHY VS SELLMEIER
+# GRAFIK: CAUCHY VS SELLMEIER (DINAMIS - TERGANTUNG MATERIAL)
 # ============================================================================
 st.markdown("---")
-st.markdown("### 📈 Fitting Model Dispersi: Cauchy vs Sellmeier")
+st.markdown("### 📈 Model Dispersi: Cauchy vs Sellmeier (Dinamis)")
+
+# Koefisien berdasarkan material yang dipilih
+material_coefficients = {
+    "Kaca Crown (n=1.52)": {
+        'cauchy': {'A': 1.5046, 'B': 4.47e3, 'C': 1.70e8},
+        'sellmeier': {'B1': 1.03961212, 'B2': 0.231792344, 'B3': 1.01046945,
+                      'C1': 6.00069867e-3, 'C2': 2.00179144e-2, 'C3': 1.03560653e2}
+    },
+    "Kaca Flint (n=1.65)": {
+        'cauchy': {'A': 1.6200, 'B': 5.50e3, 'C': 2.10e8},
+        'sellmeier': {'B1': 1.3400, 'B2': 0.3100, 'B3': 1.2500,
+                      'C1': 7.5e-3, 'C2': 2.5e-2, 'C3': 1.1e2}
+    },
+    "Safir (n=1.77)": {
+        'cauchy': {'A': 1.7500, 'B': 6.20e3, 'C': 2.50e8},
+        'sellmeier': {'B1': 1.4500, 'B2': 0.3500, 'B3': 1.3500,
+                      'C1': 8.0e-3, 'C2': 2.8e-2, 'C3': 1.2e2}
+    },
+    "Berlian (n=2.42)": {
+        'cauchy': {'A': 2.4000, 'B': 8.50e3, 'C': 3.50e8},
+        'sellmeier': {'B1': 2.1000, 'B2': 0.5000, 'B3': 1.8000,
+                      'C1': 1.0e-2, 'C2': 3.5e-2, 'C3': 1.5e2}
+    }
+}
+
+# Dapatkan koefisien untuk material yang dipilih
+if material_preset == "Custom":
+    # Gunakan nilai custom
+    cauchy_params = {'A': 1.5046, 'B': 4.47e3, 'C': 1.70e8}
+    sellmeier_params = {'B1': 1.03961212, 'B2': 0.231792344, 'B3': 1.01046945,
+                        'C1': 6.00069867e-3, 'C2': 2.00179144e-2, 'C3': 1.03560653e2}
+else:
+    coeffs = material_coefficients[material_preset]
+    cauchy_params = coeffs['cauchy']
+    sellmeier_params = coeffs['sellmeier']
+
+# Hitung dengan parameter dinamis
+def cauchy_dynamic(wl, params):
+    return params['A'] + params['B'] / (wl ** 2) + params['C'] / (wl ** 4)
+
+def sellmeier_dynamic(wl, params):
+    wl_um = wl * 1e-3
+    n_sq = 1 + (params['B1'] * wl_um**2 / (wl_um**2 - params['C1'])) + \
+               (params['B2'] * wl_um**2 / (wl_um**2 - params['C2'])) + \
+               (params['B3'] * wl_um**2 / (wl_um**2 - params['C3']))
+    return np.sqrt(n_sq)
 
 wavelength_range = np.linspace(380, 750, 100)
-n_cauchy = [cauchy_equation(wl) for wl in wavelength_range]
-n_sellmeier = [sellmeier_equation(wl) for wl in wavelength_range]
+n_cauchy_dyn = [cauchy_dynamic(wl, cauchy_params) for wl in wavelength_range]
+n_sellmeier_dyn = [sellmeier_dynamic(wl, sellmeier_params) for wl in wavelength_range]
 
-fig2, ax2 = plt.subplots(figsize=(12, 6), dpi=100)
-fig2.patch.set_facecolor('#f8f9fa')
-ax2.set_facecolor('#ffffff')
+fig_dyn, ax_dyn = plt.subplots(figsize=(12, 6), dpi=100)
+ax_dyn.plot(wavelength_range, n_cauchy_dyn, 'b-', linewidth=2.5, label='Cauchy', alpha=0.8)
+ax_dyn.plot(wavelength_range, n_sellmeier_dyn, 'r--', linewidth=2.5, label='Sellmeier', alpha=0.8)
 
-ax2.plot(wavelength_range, n_cauchy, 'b-', linewidth=2.5, label='Model Cauchy', alpha=0.8)
-ax2.plot(wavelength_range, n_sellmeier, 'r--', linewidth=2.5, label='Model Sellmeier', alpha=0.8)
+# Tampilkan nilai n pada 550 nm (hijau)
+n_cauchy_550 = cauchy_dynamic(550, cauchy_params)
+n_sellmeier_550 = sellmeier_dynamic(550, sellmeier_params)
 
-for wl, color in zip(wavelengths, colors):
-    n_c = cauchy_equation(wl)
-    n_s = sellmeier_equation(wl)
-    ax2.scatter([wl], [n_c], color=color, s=100, zorder=5, edgecolors='black', linewidth=1)
-    ax2.scatter([wl], [n_s], color=color, s=100, marker='s', zorder=5, edgecolors='black', linewidth=1)
+ax_dyn.axvline(x=550, color='green', linestyle=':', alpha=0.5)
+ax_dyn.scatter([550], [n_cauchy_550], color='blue', s=100, zorder=5)
+ax_dyn.scatter([550], [n_sellmeier_550], color='red', s=100, zorder=5)
 
-ax2.set_xlabel('Panjang Gelombang (nm)', fontsize=12, fontweight='bold')
-ax2.set_ylabel('Indeks Bias (n)', fontsize=12, fontweight='bold')
-ax2.set_title('Perbandingan Model Dispersi Cauchy vs Sellmeier', fontsize=14, fontweight='bold', pad=15)
-ax2.legend(fontsize=11, loc='upper right')
-ax2.grid(True, alpha=0.3, linestyle='--')
-ax2.set_xlim(350, 780)
+ax_dyn.set_xlabel('Panjang Gelombang (nm)', fontsize=12, fontweight='bold')
+ax_dyn.set_ylabel('Indeks Bias (n)', fontsize=12, fontweight='bold')
+ax_dyn.set_title(f'Model Dispersi untuk {material_preset}', fontsize=14, fontweight='bold', pad=15)
+ax_dyn.legend(fontsize=11, loc='upper right')
+ax_dyn.grid(True, alpha=0.3, linestyle='--')
+ax_dyn.set_xlim(350, 780)
 
 plt.tight_layout()
-st.pyplot(fig2)
-plt.close(fig2)
+st.pyplot(fig_dyn)
+plt.close(fig_dyn)
+
+st.info(f"**Indeks bias pada λ = 550 nm:** Cauchy = {n_cauchy_550:.4f}, Sellmeier = {n_sellmeier_550:.4f}")
 
 st.markdown("""
 <div class="info-box">
@@ -570,53 +617,261 @@ $$\\delta_{\\text{min}} = 2 \\cdot \\arcsin\\!\\big(n \\cdot \\sin(A/2)\\big) - 
 """, unsafe_allow_html=True)
 
 # ============================================================================
+# KALKULATOR SUDUT DEVIASI MINIMUM
+# ============================================================================
+st.markdown("---")
+st.markdown("### 🎯 Kalkulator Sudut Deviasi Minimum")
+
+st.markdown("""
+<div class="info-box">
+
+**Rumus Sudut Deviasi Minimum:**
+
+$$\\delta_{min} = 2 \\cdot \\arcsin\\left(n \\cdot \\sin\\left(\\frac{A}{2}\\right)\\right) - A$$
+
+**Kondisi:** Terjadi saat $i_1 = r_2$ dan $r_1 = i_2$ (sinar simetris)
+
+</div>
+""", unsafe_allow_html=True)
+
+if results:
+    A_rad = np.radians(prism_angle)
+    
+    col_min1, col_min2, col_min3 = st.columns(3)
+    
+    for i, (result, col) in enumerate(zip([results[0], results[len(results)//2], results[-1]], 
+                                           [col_min1, col_min2, col_min3])):
+        n = result['n']
+        try:
+            sin_term = n * np.sin(A_rad / 2)
+            if sin_term <= 1:
+                delta_min = 2 * np.arcsin(sin_term) - A_rad
+                delta_min_deg = np.degrees(delta_min)
+                
+                with col:
+                    st.metric(
+                        f"{result['warna']} (λ={result['wl']} nm)",
+                        f"{delta_min_deg:.2f}°",
+                        delta=f"{delta_min_deg - result['delta']:.2f}° vs saat ini"
+                    )
+            else:
+                with col:
+                    st.error(f"{result['warna']}: TIR")
+        except Exception as e:
+            with col:
+                st.error(f"Error: {e}")
+                
+# ============================================================================
 # GRAFIK: DISPERSI n vs λ
 # ============================================================================
 st.markdown("---")
 st.markdown("### 🌈 Kurva Dispersi: n vs λ")
 
-wavelength_range = np.linspace(380, 750, 100)
-B_values = [4.0e3, 5.0e3, 6.0e3]
-labels_B = ['Dispersi Rendah', 'Dispersi Sedang', 'Dispersi Tinggi']
-colors_B = ['#2ECC71', '#F39C12', '#E74C3C']
+# ----------------------------------------
+# 1. KOEFISIEN DINAMIS BERDASARKAN MATERIAL
+# ----------------------------------------
+material_coefficients = {
+    "Kaca Crown (n=1.52)": {
+        'cauchy': {'A': 1.5046, 'B': 4.47e3, 'C': 1.70e8},
+        'sellmeier': {'B1': 1.03961212, 'B2': 0.231792344, 'B3': 1.01046945,
+                      'C1': 6.00069867e-3, 'C2': 2.00179144e-2, 'C3': 1.03560653e2}
+    },
+    "Kaca Flint (n=1.65)": {
+        'cauchy': {'A': 1.6200, 'B': 5.50e3, 'C': 2.10e8},
+        'sellmeier': {'B1': 1.3400, 'B2': 0.3100, 'B3': 1.2500,
+                      'C1': 7.5e-3, 'C2': 2.5e-2, 'C3': 1.1e2}
+    },
+    "Safir (n=1.77)": {
+        'cauchy': {'A': 1.7500, 'B': 6.20e3, 'C': 2.50e8},
+        'sellmeier': {'B1': 1.4500, 'B2': 0.3500, 'B3': 1.3500,
+                      'C1': 8.0e-3, 'C2': 2.8e-2, 'C3': 1.2e2}
+    },
+    "Berlian (n=2.42)": {
+        'cauchy': {'A': 2.4000, 'B': 8.50e3, 'C': 3.50e8},
+        'sellmeier': {'B1': 2.1000, 'B2': 0.5000, 'B3': 1.8000,
+                      'C1': 1.0e-2, 'C2': 3.5e-2, 'C3': 1.5e2}
+    }
+}
 
-fig_disp, ax_disp = plt.subplots(figsize=(10, 6), dpi=100)
+# Ambil parameter berdasarkan input user
+if material_preset == "Custom":
+    # Untuk custom, gunakan nilai slider refractive_index untuk menyesuaikan koefisien A
+    base_A = refractive_index  # Gunakan nilai dari slider
+    cauchy_params = {'A': base_A, 'B': 4.47e3, 'C': 1.70e8}
+    sellmeier_params = {'B1': 1.03961212, 'B2': 0.231792344, 'B3': 1.01046945,
+                        'C1': 6.00069867e-3, 'C2': 2.00179144e-2, 'C3': 1.03560653e2}
+else:
+    coeffs = material_coefficients[material_preset]
+    cauchy_params = coeffs['cauchy']
+    sellmeier_params = coeffs['sellmeier']
 
-for B, label, color in zip(B_values, labels_B, colors_B):
-    n_disp = [1.5 + B / (wl**2) for wl in wavelength_range]
-    ax_disp.plot(wavelength_range, n_disp, color=color, linewidth=2.5, label=label, alpha=0.8)
+# Fungsi dinamis dengan parameter
+def cauchy_dynamic(wl, params):
+    """Persamaan Cauchy dengan parameter dinamis"""
+    return params['A'] + params['B'] / (wl ** 2) + params['C'] / (wl ** 4)
 
-for wl, color in zip([700, 620, 580, 530, 470, 420, 380], 
-                     ['#FF0000', '#FF7F00', '#FFFF00', '#00FF00', '#0000FF', '#4B0082', '#9400D3']):
-    n_val = 1.5 + 5000 / (wl**2)
-    ax_disp.scatter([wl], [n_val], color=color, s=80, edgecolors='black', zorder=5)
+def sellmeier_dynamic(wl, params):
+    """Persamaan Sellmeier dengan parameter dinamis"""
+    wl_um = wl * 1e-3
+    n_sq = 1 + (params['B1'] * wl_um**2 / (wl_um**2 - params['C1'])) + \
+               (params['B2'] * wl_um**2 / (wl_um**2 - params['C2'])) + \
+               (params['B3'] * wl_um**2 / (wl_um**2 - params['C3']))
+    return np.sqrt(n_sq)
 
+# ----------------------------------------
+# 2. GENERATE DATA GRAFIK
+# ----------------------------------------
+wavelength_range = np.linspace(380, 750, 200)  # Lebih halus
+
+# Pilih model yang aktif
+model_key = 'cauchy' if dispersion_model == 'Cauchy' else 'sellmeier'
+params_active = cauchy_params if model_key == 'cauchy' else sellmeier_params
+func_active = cauchy_dynamic if model_key == 'cauchy' else sellmeier_dynamic
+
+# Hitung kurva utama (model yang dipilih)
+n_values_active = [func_active(wl, params_active) for wl in wavelength_range]
+
+# Hitung kurva pembanding (model alternatif)
+params_alt = sellmeier_params if model_key == 'cauchy' else cauchy_params
+func_alt = sellmeier_dynamic if model_key == 'cauchy' else cauchy_dynamic
+n_values_alt = [func_alt(wl, params_alt) for wl in wavelength_range]
+
+# ----------------------------------------
+# 3. PLOT GRAFIK
+# ----------------------------------------
+fig_disp, ax_disp = plt.subplots(figsize=(11, 7), dpi=100)
+fig_disp.patch.set_facecolor('#f8f9fa')
+ax_disp.set_facecolor('#ffffff')
+
+# Plot kurva model aktif (tebal)
+line_style = '-' if model_key == 'cauchy' else '--'
+ax_disp.plot(wavelength_range, n_values_active, 
+             color='#667eea' if model_key == 'cauchy' else '#e74c3c', 
+             linewidth=3, label=f'{dispersion_model} (Aktif)', alpha=0.9, zorder=5)
+
+# Plot kurva model alternatif (tipis, sebagai pembanding)
+alt_style = '--' if model_key == 'cauchy' else '-'
+ax_disp.plot(wavelength_range, n_values_alt, 
+             color='gray', linewidth=1.5, 
+             label=f'{"Sellmeier" if model_key == "cauchy" else "Cauchy"} (Pembanding)', 
+             alpha=0.5, zorder=3)
+
+# Plot titik spektrum warna (dinamis sesuai model aktif)
+spectrum_wl = [700, 620, 580, 530, 470, 420, 380]
+spectrum_colors = ['#FF0000', '#FF7F00', '#FFFF00', '#00FF00', '#0000FF', '#4B0082', '#9400D3']
+spectrum_names = ['Merah', 'Jingga', 'Kuning', 'Hijau', 'Biru', 'Nila', 'Ungu']
+
+for wl, color, name in zip(spectrum_wl, spectrum_colors, spectrum_names):
+    n_val = func_active(wl, params_active)
+    ax_disp.scatter([wl], [n_val], color=color, s=120, edgecolors='black', 
+                    linewidth=1.5, zorder=6, label=name)
+
+# ----------------------------------------
+# 4. INFORMASI NILAI PADA PANJANG GELOMBANG TERTENTU
+# ----------------------------------------
+# Tampilkan nilai n pada 3 panjang gelombang referensi
+ref_wavelengths = [400, 550, 700]
+ref_labels = ['Violet (400 nm)', 'Hijau (550 nm)', 'Merah (700 nm)']
+
+for wl_ref, label_ref in zip(ref_wavelengths, ref_labels):
+    n_ref = func_active(wl_ref, params_active)
+    ax_disp.axvline(x=wl_ref, color='gray', linestyle=':', alpha=0.3)
+    ax_disp.text(wl_ref + 5, n_ref + 0.005, f'{label_ref}\nn = {n_ref:.4f}', 
+                 fontsize=9, bbox=dict(boxstyle='round', facecolor='white', alpha=0.8))
+
+# ----------------------------------------
+# 5. FORMATTING GRAFIK
+# ----------------------------------------
 ax_disp.set_xlabel('Panjang Gelombang λ (nm)', fontsize=12, fontweight='bold')
 ax_disp.set_ylabel('Indeks Bias (n)', fontsize=12, fontweight='bold')
-ax_disp.set_title('Ketergantungan Indeks Bias terhadap Panjang Gelombang', fontsize=14, fontweight='bold', pad=15)
-ax_disp.legend(fontsize=10, loc='upper right')
+
+# Title dinamis
+title_text = f'Kurva Dispersi: {material_preset} ({dispersion_model})'
+ax_disp.set_title(title_text, fontsize=14, fontweight='bold', pad=15)
+
+# Legend dengan 2 kolom agar tidak menumpuk
+ax_disp.legend(fontsize=9, loc='upper right', ncol=2, framealpha=0.9)
 ax_disp.grid(True, alpha=0.3, linestyle='--')
+ax_disp.set_xlim(370, 760)
+
+# Invert x-axis (konvensi optik: λ besar di kiri)
 ax_disp.invert_xaxis()
 
 plt.tight_layout()
 st.pyplot(fig_disp)
 plt.close(fig_disp)
 
-# Penjelasan kurva dispersi (PERBAIKAN STRING)
-st.markdown("""
+# ----------------------------------------
+# 6. INFO BOX DINAMIS
+# ----------------------------------------
+n_550 = func_active(550, params_active)
+n_400 = func_active(400, params_active)
+n_700 = func_active(700, params_active)
+dispersion_power = n_400 - n_700  # Ukuran kekuatan dispersi
+
+st.markdown(f"""
 <div style='background: #fff3cd; padding: 15px; border-radius: 8px; margin-top: 10px;'>
 
-**📝 Catatan:**
+**📊 Informasi Material: {material_preset}**
 
+| Panjang Gelombang | Indeks Bias (n) |
+|------------------|-----------------|
+| 🔴 Merah (700 nm) | {n_700:.4f} |
+| 🟢 Hijau (550 nm) | {n_550:.4f} |
+| 🔵 Violet (400 nm) | {n_400:.4f} |
+
+**🌈 Kekuatan Dispersi:** Δn = n(400nm) - n(700nm) = **{dispersion_power:.4f}**
+
+**📝 Catatan:**
 - Kurva menunjukkan **dispersi normal**: n menurun saat λ meningkat
-- **Dispersi tinggi** = kurva lebih curam = pemisahan warna lebih jelas
-- Material dengan dispersi tinggi (seperti flint glass) menghasilkan spektrum lebih lebar
+- Semakin **curam kurva**, semakin **kuat dispersi** → spektrum lebih terpisah
+- Model **{dispersion_model}** digunakan untuk perhitungan ini
 
 </div>
 """, unsafe_allow_html=True)
 
 # ============================================================================
-# FOOTER (PERBAIKAN STRING)
+# EXPORT DATA (CSV & PNG)
+# ============================================================================
+st.markdown("---")
+st.markdown("### 💾 Export Data")
+
+col_exp1, col_exp2, col_exp3 = st.columns(3)
+
+with col_exp1:
+    if results:
+        df_export = pd.DataFrame(results)
+        csv = df_export.to_csv(index=False).encode('utf-8')
+        st.download_button(
+            label="📥 Download Data (CSV)",
+            data=csv,
+            file_name=f"prisma_data_i{incident_angle}_A{prism_angle}.csv",
+            mime="text/csv",
+        )
+
+with col_exp2:
+    if 'fig_ray' in locals():
+        buf = io.BytesIO()
+        fig_ray.savefig(buf, format='png', dpi=150, bbox_inches='tight')
+        buf.seek(0)
+        st.download_button(
+            label="📥 Download Diagram (PNG)",
+            data=buf,
+            file_name=f"prisma_diagram_i{incident_angle}_A{prism_angle}.png",
+            mime="image/png",
+        )
+
+with col_exp3:
+    st.download_button(
+        label="📥 Download Semua Grafik (ZIP)",
+        data=b"Coming soon...",
+        file_name="all_plots.zip",
+        mime="application/zip",
+        disabled=True
+    )
+    
+# ============================================================================
+# FOOTER
 # ============================================================================
 st.markdown("---")
 
