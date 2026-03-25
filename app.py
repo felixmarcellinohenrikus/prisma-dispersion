@@ -274,7 +274,6 @@ from pathlib import Path
 
 image_path = Path("prisma_diagram.jpg")
 
-# Bagi layar untuk center
 col1, col2, col3 = st.columns([1, 2, 1])
 
 with col2:
@@ -290,7 +289,6 @@ with col2:
         st.error("⚠️ File prisma_diagram.jpg tidak ditemukan!")
         st.info("💡 Pastikan file sudah diupload ke GitHub (sama folder dengan app.py)")
 
-# Keterangan
 st.markdown("""
 <div style='background: white; padding: 20px; border-radius: 10px; border: 2px solid #667eea;'>
 
@@ -402,7 +400,6 @@ if results:
 st.markdown("---")
 st.markdown("### 📈 Model Dispersi: Cauchy vs Sellmeier (Dinamis)")
 
-# Koefisien berdasarkan material yang dipilih
 material_coefficients = {
     "Kaca Crown (n=1.52)": {
         'cauchy': {'A': 1.5046, 'B': 4.47e3, 'C': 1.70e8},
@@ -426,9 +423,7 @@ material_coefficients = {
     }
 }
 
-# Dapatkan koefisien untuk material yang dipilih
 if material_preset == "Custom":
-    # Gunakan nilai custom
     cauchy_params = {'A': 1.5046, 'B': 4.47e3, 'C': 1.70e8}
     sellmeier_params = {'B1': 1.03961212, 'B2': 0.231792344, 'B3': 1.01046945,
                         'C1': 6.00069867e-3, 'C2': 2.00179144e-2, 'C3': 1.03560653e2}
@@ -437,7 +432,6 @@ else:
     cauchy_params = coeffs['cauchy']
     sellmeier_params = coeffs['sellmeier']
 
-# Hitung dengan parameter dinamis
 def cauchy_dynamic(wl, params):
     return params['A'] + params['B'] / (wl ** 2) + params['C'] / (wl ** 4)
 
@@ -456,7 +450,6 @@ fig_dyn, ax_dyn = plt.subplots(figsize=(12, 6), dpi=100)
 ax_dyn.plot(wavelength_range, n_cauchy_dyn, 'b-', linewidth=2.5, label='Cauchy', alpha=0.8)
 ax_dyn.plot(wavelength_range, n_sellmeier_dyn, 'r--', linewidth=2.5, label='Sellmeier', alpha=0.8)
 
-# Tampilkan nilai n pada 550 nm (hijau)
 n_cauchy_550 = cauchy_dynamic(550, cauchy_params)
 n_sellmeier_550 = sellmeier_dynamic(550, sellmeier_params)
 
@@ -599,7 +592,6 @@ plt.tight_layout()
 st.pyplot(fig_n)
 plt.close(fig_n)
 
-# Penjelasan grafik indeks bias (PERBAIKAN STRING)
 st.markdown("""
 <div style='background: #e8f4f8; padding: 15px; border-radius: 8px; margin-top: 10px;'>
 
@@ -693,10 +685,8 @@ material_coefficients = {
     }
 }
 
-# Ambil parameter berdasarkan input user
 if material_preset == "Custom":
-    # Untuk custom, gunakan nilai slider refractive_index untuk menyesuaikan koefisien A
-    base_A = refractive_index  # Gunakan nilai dari slider
+    base_A = refractive_index
     cauchy_params = {'A': base_A, 'B': 4.47e3, 'C': 1.70e8}
     sellmeier_params = {'B1': 1.03961212, 'B2': 0.231792344, 'B3': 1.01046945,
                         'C1': 6.00069867e-3, 'C2': 2.00179144e-2, 'C3': 1.03560653e2}
@@ -705,7 +695,6 @@ else:
     cauchy_params = coeffs['cauchy']
     sellmeier_params = coeffs['sellmeier']
 
-# Fungsi dinamis dengan parameter
 def cauchy_dynamic(wl, params):
     """Persamaan Cauchy dengan parameter dinamis"""
     return params['A'] + params['B'] / (wl ** 2) + params['C'] / (wl ** 4)
@@ -721,17 +710,14 @@ def sellmeier_dynamic(wl, params):
 # ----------------------------------------
 # 2. GENERATE DATA GRAFIK
 # ----------------------------------------
-wavelength_range = np.linspace(380, 750, 200)  # Lebih halus
+wavelength_range = np.linspace(380, 750, 200)
 
-# Pilih model yang aktif
 model_key = 'cauchy' if dispersion_model == 'Cauchy' else 'sellmeier'
 params_active = cauchy_params if model_key == 'cauchy' else sellmeier_params
 func_active = cauchy_dynamic if model_key == 'cauchy' else sellmeier_dynamic
 
-# Hitung kurva utama (model yang dipilih)
 n_values_active = [func_active(wl, params_active) for wl in wavelength_range]
 
-# Hitung kurva pembanding (model alternatif)
 params_alt = sellmeier_params if model_key == 'cauchy' else cauchy_params
 func_alt = sellmeier_dynamic if model_key == 'cauchy' else cauchy_dynamic
 n_values_alt = [func_alt(wl, params_alt) for wl in wavelength_range]
@@ -743,20 +729,17 @@ fig_disp, ax_disp = plt.subplots(figsize=(11, 7), dpi=100)
 fig_disp.patch.set_facecolor('#f8f9fa')
 ax_disp.set_facecolor('#ffffff')
 
-# Plot kurva model aktif (tebal)
 line_style = '-' if model_key == 'cauchy' else '--'
 ax_disp.plot(wavelength_range, n_values_active, 
              color='#667eea' if model_key == 'cauchy' else '#e74c3c', 
              linewidth=3, label=f'{dispersion_model} (Aktif)', alpha=0.9, zorder=5)
 
-# Plot kurva model alternatif (tipis, sebagai pembanding)
 alt_style = '--' if model_key == 'cauchy' else '-'
 ax_disp.plot(wavelength_range, n_values_alt, 
              color='gray', linewidth=1.5, 
              label=f'{"Sellmeier" if model_key == "cauchy" else "Cauchy"} (Pembanding)', 
              alpha=0.5, zorder=3)
 
-# Plot titik spektrum warna (dinamis sesuai model aktif)
 spectrum_wl = [700, 620, 580, 530, 470, 420, 380]
 spectrum_colors = ['#FF0000', '#FF7F00', '#FFFF00', '#00FF00', '#0000FF', '#4B0082', '#9400D3']
 spectrum_names = ['Merah', 'Jingga', 'Kuning', 'Hijau', 'Biru', 'Nila', 'Ungu']
@@ -779,9 +762,9 @@ for wl_ref, label_ref in zip(ref_wavelengths, ref_labels):
     ax_disp.text(wl_ref + 5, n_ref + 0.005, f'{label_ref}\nn = {n_ref:.4f}', 
                  fontsize=9, bbox=dict(boxstyle='round', facecolor='white', alpha=0.8))
 
-# ----------------------------------------
+# ============================================================================
 # 5. FORMATTING GRAFIK
-# ----------------------------------------
+# ============================================================================
 ax_disp.set_xlabel('Panjang Gelombang λ (nm)', fontsize=12, fontweight='bold')
 ax_disp.set_ylabel('Indeks Bias (n)', fontsize=12, fontweight='bold')
 
@@ -789,14 +772,34 @@ ax_disp.set_ylabel('Indeks Bias (n)', fontsize=12, fontweight='bold')
 title_text = f'Kurva Dispersi: {material_preset} ({dispersion_model})'
 ax_disp.set_title(title_text, fontsize=14, fontweight='bold', pad=15)
 
-# Legend dengan 2 kolom agar tidak menumpuk
-ax_disp.legend(fontsize=9, loc='upper right', ncol=2, framealpha=0.9)
+# ========================================
+# LEGEND DI LUAR GRAFIK (BAWAH SUMBU X)
+# ========================================
+legend_curves = ax_disp.legend(
+    fontsize=9, 
+    loc='upper center',
+    bbox_to_anchor=(0.5, -0.18),
+    ncol=2,
+    framealpha=0.9,
+    frameon=True,
+    fancybox=True,
+    shadow=False
+)
+
+# Atau jika ingin legend lebih rapi dengan 3 kolom:
+# legend_curves = ax_disp.legend(
+#     fontsize=9, 
+#     loc='lower center',
+#     bbox_to_anchor=(0.5, -0.25),
+#     ncol=3,
+#     framealpha=0.9,
+#     frameon=True
+# )
+
 ax_disp.grid(True, alpha=0.3, linestyle='--')
 ax_disp.set_xlim(370, 760)
-
-# Invert x-axis (konvensi optik: λ besar di kiri)
 ax_disp.invert_xaxis()
-
+plt.tight_layout(rect=[0, 0.1, 1, 1]) 
 plt.tight_layout()
 st.pyplot(fig_disp)
 plt.close(fig_disp)
@@ -807,7 +810,7 @@ plt.close(fig_disp)
 n_550 = func_active(550, params_active)
 n_400 = func_active(400, params_active)
 n_700 = func_active(700, params_active)
-dispersion_power = n_400 - n_700  # Ukuran kekuatan dispersi
+dispersion_power = n_400 - n_700 
 
 st.markdown(f"""
 <div style='background: #fff3cd; padding: 15px; border-radius: 8px; margin-top: 10px;'>
