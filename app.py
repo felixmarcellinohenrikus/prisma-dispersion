@@ -59,7 +59,7 @@ st.markdown("""
         padding: 25px 20px;
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         border-radius: 10px;
-        margin-bottom: 30px;
+        margin-bottom: 10px;
     }
 
     .main-header h1 {
@@ -87,7 +87,7 @@ st.markdown("""
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         border-radius: 10px;
         color: #ffffff !important;
-        margin-top: 30px;
+        margin-top: 10px;
     }
 
     .footer *,
