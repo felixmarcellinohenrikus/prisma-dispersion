@@ -265,107 +265,28 @@ else:
     st.warning("💡 **Saran:** Gunakan sudut datang antara 30°-60° dan sudut prisma 60°.")
 
 # ============================================================================
-# ILUSTRASI RAY TRACING - MATPLOTLIB DENGAN KOORDINAT PRESISI
+# ILUSTRASI RAY TRACING - MENGGUNAKAN GAMBAR DARI REPO
 # ============================================================================
 st.markdown("---")
 st.markdown("### 🔍 Ilustrasi Ray Tracing pada Prisma")
 
-def create_prisma_diagram_matplotlib():
-    """Buat diagram prisma dengan koordinat yang presisi"""
-    fig, ax = plt.subplots(figsize=(11, 7), dpi=100)
-    
-    # PRISMA GEOMETRY
-    prism_height = 4.0
-    apex_x, apex_y = 0, prism_height
-    base_width = 5.0
-    base_left_x, base_y = -base_width/2, 0
-    base_right_x, _ = base_width/2, 0
-    
-    prism = Polygon([[apex_x, apex_y], [base_left_x, base_y], [base_right_x, base_y]], 
-                    fill=True, alpha=0.15, edgecolor='black', linewidth=1.5, facecolor='skyblue')
-    ax.add_patch(prism)
-    
-    # ENTRY POINT (35% dari base ke apex di sisi kiri)
-    t_entry = 0.35
-    entry_x = base_left_x + t_entry * (apex_x - base_left_x)
-    entry_y = base_y + t_entry * (apex_y - base_y)
-    
-    # INCIDENT RAY
-    incident_start_x = entry_x - 4.0
-    incident_start_y = entry_y - 1.5
-    ax.plot([incident_start_x, entry_x], [incident_start_y, entry_y], 
-            'k-', linewidth=2.5, label='Sinar Datang', zorder=5)
-    
-    # Extension
-    ext_end_x = entry_x + 5.0
-    ext_end_y = entry_y + 1.875
-    ax.plot([entry_x, ext_end_x], [entry_y, ext_end_y], 
-            'k:', linewidth=1, alpha=0.4, zorder=1)
-    
-    # EXIT POINT (50% dari apex ke base di sisi kanan)
-    t_exit = 0.50
-    exit_x = apex_x + t_exit * (base_right_x - apex_x)
-    exit_y = apex_y - t_exit * (apex_y - base_y)
-    
-    # Internal ray
-    ax.plot([entry_x, exit_x], [entry_y, exit_y], 
-            color='#1E3A8A', linewidth=2, alpha=0.8, zorder=4, label='Sinar dalam Prisma')
-    
-    # Emergent spectrum
-    spectrum_colors = ['#FF0000', '#FF7F00', '#FFFF00', '#00FF00', '#0000FF', '#4B0082', '#9400D3']
-    spectrum_labels = ['Merah', 'Jingga', 'Kuning', 'Hijau', 'Biru', 'Nila', 'Ungu']
-    
-    for i, (color, label) in enumerate(zip(spectrum_colors, spectrum_labels)):
-        emergent_angle = np.radians(45 + i * 3)
-        end_x = exit_x + 3.5 * np.cos(-emergent_angle)
-        end_y = exit_y + 3.5 * np.sin(-emergent_angle)
-        
-        ax.plot([exit_x, end_x], [exit_y, end_y], 
-                color=color, linewidth=2, alpha=0.9, 
-                label=label if i < 4 else "", zorder=5)
-        
-        back_x = exit_x - 2.0 * np.cos(-emergent_angle)
-        back_y = exit_y - 2.0 * np.sin(-emergent_angle)
-        ax.plot([exit_x, back_x], [exit_y, back_y], 
-                color=color, linewidth=0.5, alpha=0.25, linestyle=':', zorder=1)
-    
-    # Normal lines
-    ax.plot([entry_x - 0.8, entry_x + 0.8], [entry_y - 0.3, entry_y + 0.3], 
-            'k--', linewidth=1, alpha=0.6, zorder=2)
-    ax.plot([exit_x - 0.5, exit_x + 0.5], [exit_y - 0.4, exit_y + 0.4], 
-            'k--', linewidth=1, alpha=0.6, zorder=2)
-    
-    # Angle labels
-    ax.text(entry_x-1.0, entry_y+0.5, 'i₁', fontsize=12, fontweight='bold', zorder=6)
-    ax.text(entry_x+0.3, entry_y-0.4, 'r₁', fontsize=12, fontweight='bold', zorder=6)
-    ax.text(exit_x-0.7, exit_y-0.5, 'i₂', fontsize=12, fontweight='bold', zorder=6)
-    ax.text(exit_x+0.4, exit_y+0.5, 'r₂', fontsize=12, fontweight='bold', zorder=6)
-    ax.text(0, apex_y - 0.5, f'A = 60°', fontsize=11, fontweight='bold', ha='center', zorder=6)
-    
-    # Arc for angle A
-    arc_A = np.linspace(2*np.pi/3, np.pi/3, 30)
-    ax.plot(0.6*np.cos(arc_A), apex_y - 0.6*np.sin(arc_A), 'k-', linewidth=1.5, zorder=6)
-    
-    # Deviation angle
-    ax.text(2.5, 2.0, 'δ', fontsize=13, fontweight='bold', color='red', zorder=6)
-    dev_center_x, dev_center_y = 2.0, 1.5
-    dev_arc = np.linspace(0.15, 0.55, 30)
-    ax.plot(dev_center_x + 2.5*np.cos(dev_arc), dev_center_y + 2.5*np.sin(dev_arc), 
-            'r--', linewidth=1.5, zorder=6)
-    
-    ax.set_xlim(-6, 6)
-    ax.set_ylim(-1, 5.5)
-    ax.set_aspect('equal')
-    ax.axis('off')
-    ax.legend(loc='upper left', fontsize=9, framealpha=0.9)
-    
-    plt.tight_layout()
-    return fig
+from pathlib import Path
 
-# Display
-fig = create_prisma_diagram_matplotlib()
-st.pyplot(fig)
-plt.close(fig)
+# Path gambar (sama folder dengan app.py)
+image_path = Path("prisma_diagram.jpg")
+
+# Cek dan tampilkan gambar
+if image_path.exists():
+    st.image(
+        str(image_path),
+        caption="Diagram Skematik Dispersi Cahaya pada Prisma",
+        use_column_width=True,
+        clamp=True
+    )
+    st.success("✅ Gambar berhasil dimuat")
+else:
+    st.error("⚠️ File prisma_diagram.jpg tidak ditemukan!")
+    st.info("💡 Pastikan file sudah diupload ke GitHub repository (satu folder dengan app.py)")
 
 # Keterangan
 st.markdown("""
