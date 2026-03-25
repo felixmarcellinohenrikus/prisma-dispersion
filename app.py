@@ -111,29 +111,29 @@ st.markdown("""
     div[data-testid="stMarkdownContainer"] h4 {
         color: var(--text-primary) !important;
         font-weight: bold;
-        line-height: 1.0;  /* ← INI yang mengatur spasi antar baris */
-        margin-bottom: 5px;  /* Spasi bawah heading */
+        line-height: 0.7;  /* ← INI yang mengatur spasi antar baris */
+        margin-bottom: 1px;  /* Spasi bawah heading */
     }
     
     /* Specific line height untuk masing-masing heading */
     h1, .stMarkdown h1 {
-        line-height: 1.2;  /* H1 biasanya lebih rapat */
-        margin-bottom: 10px;
+        line-height: 1.0;  /* H1 biasanya lebih rapat */
+        margin-bottom: 1px;
     }
     
     h2, .stMarkdown h2 {
         line-height: 1.0;
-        margin-bottom: 8px;
+        margin-bottom: 1px;
     }
     
     h3, .stMarkdown h3 {
         line-height: 1.0;
-        margin-bottom: 5px;
+        margin-bottom: 1px;
     }
     
     h4, .stMarkdown h4 {
         line-height: 1.0;
-        margin-bottom: 2px;
+        margin-bottom: 1px;
     }
     
     h5, .stMarkdown h5 {
