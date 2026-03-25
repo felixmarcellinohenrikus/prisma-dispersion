@@ -270,13 +270,24 @@ else:
 st.markdown("---")
 st.markdown("### 🔍 Ilustrasi Ray Tracing pada Prisma")
 
-# Download dan encode gambar
+st.markdown("### 🔍 Ilustrasi Ray Tracing pada Prisma")
+
+# Ganti USERNAME dan REPO_NAME dengan data Anda
+GITHUB_USERNAME = "felixmarcellinohenrikus"  # ← Ganti dengan username GitHub Anda
+REPO_NAME = "prisma-dispersion"      # ← Ganti dengan nama repo Anda
+BRANCH = "main"
+
+raw_image_url = f"https://raw.githubusercontent.com/{GITHUB_USERNAME}/{REPO_NAME}/{BRANCH}/images/prisma_diagram.png"
+
 try:
-    response = requests.get("https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/Prism_rainbow.svg/800px-Prism_rainbow.svg.png")
-    img_base64 = base64.b64encode(response.content).decode()
-    img_html = f'<img src="data:image/png;base64,{img_base64}" alt="Prisma" style="width:100%; max-width:600px;">'
-except:
-    img_html = "<p>⚠️ Gambar tidak tersedia</p>"
+    st.image(
+        raw_image_url,
+        caption="Diagram Skematik Dispersi Cahaya pada Prisma",
+        use_column_width=True
+    )
+except Exception as e:
+    st.error(f"⚠️ Gambar tidak bisa dimuat: {e}")
+    st.info("💡 Pastikan file sudah diupload ke GitHub dan path benar")
 
 st.markdown(f"""
 <div style='background: white; padding: 20px; border-radius: 10px;'>
