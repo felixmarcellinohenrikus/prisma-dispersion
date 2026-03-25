@@ -767,7 +767,7 @@ if results:
 st.markdown("""
 <style>
     /* ========================================
-     * TABLE - ALL CONTENT TOP-CENTER
+     * TABLE - ALL CONTENT CENTER-MIDDLE
      * ======================================== */
     
     /* Header tabel - center & middle */
@@ -777,21 +777,26 @@ st.markdown("""
         text-align: center !important;
         vertical-align: middle !important;
         padding: 15px 10px !important;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+        background: #667eea !important;  /* ← SOLID COLOR */
         color: #ffffff !important;
         font-weight: bold;
         border: 1px solid #ffffff30 !important;
     }
     
-    /* Body tabel - center & top */
+    /* Body tabel - center & middle */
     .stDataFrame tbody td,
     div[data-testid="stDataFrame"] tbody td,
     table tbody td {
         text-align: center !important;
-        vertical-align: middle !important;
+        vertical-align: middle !important;  /* ← Sudah middle */
         padding: 12px 10px !important;
         color: var(--text-primary) !important;
         border: 1px solid #e0e0e0 !important;
+    }
+    
+    /* Row height untuk memastikan vertical align bekerja */
+    .stDataFrame tbody tr {
+        height: 50px;  /* ← Tambahkan ini */
     }
     
     /* Alternating row colors */
