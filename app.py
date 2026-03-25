@@ -725,5 +725,4 @@ st.markdown(
         <p>Untuk pembelajaran Optika Geometri di Fisika UKSW Salatiga</p>
     </div>
     """,
-    unsafe_allow_html=True
-)
+    unsafe_allow_html=True)
