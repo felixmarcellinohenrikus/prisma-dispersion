@@ -271,7 +271,7 @@ st.markdown("---")
 st.markdown("### 🔍 Ilustrasi Ray Tracing pada Prisma")
 
 # Encode gambar ke base64
-with open('images/prisma_diagram.png', 'rb') as img_file:
+with open('prisma_diagram.png', 'rb') as img_file:
     img_base64 = base64.b64encode(img_file.read()).decode()
 
 # Tampilkan dengan HTML
