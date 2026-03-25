@@ -29,27 +29,25 @@ st.set_page_config(
 st.markdown("""
 <style>
     /* ========================================
-     * HIDE THEME SWITCHER
+     * HIDE THEME SWITCHER ONLY (NOT SIDEBAR)
      * ======================================== */
-    header {
-        visibility: hidden;
-    }
     
-    /* Atau hide hanya tombol theme */
+    /* Hide specific theme toggle button */
     button[title="Change theme"],
-    button[kind="header"] {
+    button[data-testid="stToolbar"] button[aria-label="Main menu"] {
         display: none !important;
     }
-
-    /* Force sidebar selalu terbuka */
+    
+    /* Force sidebar tetap terbuka */
     section[data-testid="stSidebar"] {
         display: block !important;
         visibility: visible !important;
     }
     
-    /* Hide tombol toggle sidebar */
+    /* Pastikan sidebar toggle button tetap ada */
     button[aria-label="Toggle sidebar"] {
-        display: none !important;
+        display: block !important;
+        visibility: visible !important;
     }
     
     /* ========================================
