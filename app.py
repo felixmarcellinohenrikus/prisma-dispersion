@@ -270,21 +270,23 @@ else:
 st.markdown("---")
 st.markdown("### 🔍 Ilustrasi Ray Tracing pada Prisma")
 
-# Path gambar di repository
-image_path = "images/prisma_diagram.png"
+# Encode gambar ke base64
+with open('images/prisma_diagram.png', 'rb') as img_file:
+    img_base64 = base64.b64encode(img_file.read()).decode()
 
-# Cek apakah file ada
-import os
-if os.path.exists(image_path):
-    st.image(
-        image_path,
-        caption="Diagram Skematik Dispersi Cahaya pada Prisma",
-        use_column_width=True,
-        clamp=True
-    )
-else:
-    st.warning(f"⚠️ File gambar tidak ditemukan di {image_path}")
-    st.info("💡 Pastikan file sudah diupload ke folder images/ di repository GitHub")
+# Tampilkan dengan HTML
+st.markdown(f"""
+<div style='background: white; padding: 20px; border-radius: 10px; border: 2px solid #667eea;'>
+
+**Diagram Skematik Dispersi Cahaya pada Prisma:**
+
+<div style="text-align: center; margin: 20px 0;">
+    <img src="data:image/png;base64,{img_base64}" 
+         alt="Prisma Dispersi" 
+         style="width: 100%; max-width: 600px; border-radius: 8px;">
+</div>
+</div>
+""", unsafe_allow_html=True)
 
 # Keterangan simbol
 st.markdown("""
