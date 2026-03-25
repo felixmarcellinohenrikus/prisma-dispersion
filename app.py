@@ -261,19 +261,102 @@ else:
     st.warning("💡 **Saran:** Gunakan sudut datang antara 30°-60° dan sudut prisma 60°.")
 
 # ============================================================================
-# ILUSTRASI STATIS RAY TRACING
+# ILUSTRASI RAY TRACING - DIBUAT DENGAN MATPLOTLIB
 # ============================================================================
 st.markdown("---")
 st.markdown("### 🔍 Ilustrasi Ray Tracing pada Prisma")
 
+def create_prisma_diagram():
+    """Membuat diagram prisma yang informatif"""
+    fig, ax = plt.subplots(figsize=(10, 6), dpi=100)
+    
+    # Prisma segitiga
+    prism_x = [-2, 2, 0, -2]
+    prism_y = [-2, -2, 2.5, -2]
+    prism = Polygon([[-2, -2], [2, -2], [0, 2.5]], 
+                    fill=True, alpha=0.2, edgecolor='black', 
+                    linewidth=2, facecolor='skyblue')
+    ax.add_patch(prism)
+    
+    # Titik masuk dan keluar
+    entry_point = np.array([-1.2, -0.5])
+    exit_point = np.array([1.0, 0.8])
+    
+    # Sinar datang (hitam)
+    ax.plot([-4, entry_point[0]], [-2, entry_point[1]], 
+            'k-', linewidth=2.5, label='Sinar Datang')
+    
+    # Sinar dalam prisma (biru)
+    ax.plot([entry_point[0], exit_point[0]], 
+            [entry_point[1], exit_point[1]], 
+            'b-', linewidth=2, alpha=0.7, label='Sinar dalam Prisma')
+    
+    # Spektrum keluar (warna-warni)
+    spectrum_colors = ['#FF0000', '#FF7F00', '#FFFF00', '#00FF00', '#0000FF', '#9400D3']
+    spectrum_labels = ['Merah', 'Jingga', 'Kuning', 'Hijau', 'Biru', 'Ungu']
+    
+    for i, (color, label) in enumerate(zip(spectrum_colors, spectrum_labels)):
+        angle_offset = -0.15 + i * 0.06
+        end_x = exit_point[0] + 3 * np.cos(angle_offset)
+        end_y = exit_point[1] + 3 * np.sin(angle_offset)
+        ax.plot([exit_point[0], end_x], [exit_point[1], end_y], 
+                color=color, linewidth=2, alpha=0.8, label=label if i < 4 else "")
+    
+    # Garis normal (putus-putus)
+    normal_len = 1.0
+    # Normal di entry
+    ax.plot([entry_point[0] - 0.8, entry_point[0] + 0.8], 
+            [entry_point[1] - 0.3, entry_point[1] + 0.3], 
+            'k--', linewidth=1, alpha=0.5)
+    # Normal di exit
+    ax.plot([exit_point[0] - 0.5, exit_point[0] + 0.5], 
+            [exit_point[1] - 0.4, exit_point[1] + 0.4], 
+            'k--', linewidth=1, alpha=0.5)
+    
+    # Label sudut
+    ax.text(entry_point[0]-0.9, entry_point[1]+0.4, 'i₁', fontsize=11, fontweight='bold')
+    ax.text(entry_point[0]+0.2, entry_point[1]-0.3, 'r₁', fontsize=11, fontweight='bold')
+    ax.text(exit_point[0]-0.6, exit_point[1]-0.5, 'i₂', fontsize=11, fontweight='bold')
+    ax.text(exit_point[0]+0.3, exit_point[1]+0.5, 'r₂', fontsize=11, fontweight='bold')
+    ax.text(0, 2.7, 'A', fontsize=11, fontweight='bold', ha='center')
+    
+    # Busur sudut A
+    arc_A = np.linspace(np.pi/3, 2*np.pi/3, 30)
+    ax.plot(0.5*np.cos(arc_A), 2.5 + 0.5*np.sin(arc_A), 'k-', linewidth=1.5)
+    
+    # Perpanjangan sinar datang (titik-titik)
+    ax.plot([entry_point[0], entry_point[0] + 4], 
+            [entry_point[1], entry_point[1] + 1.5], 
+            'k:', linewidth=1, alpha=0.4)
+    
+    # Label deviasi
+    ax.text(2.5, 1.8, 'δ', fontsize=12, fontweight='bold', color='red')
+    
+    # Busur deviasi
+    dev_center = np.array([2.0, 1.0])
+    dev_arc = np.linspace(0.1, 0.6, 30)
+    ax.plot(dev_center[0] + 2.0*np.cos(dev_arc), 
+            dev_center[1] + 2.0*np.sin(dev_arc), 
+            'r--', linewidth=1.5)
+    
+    # Setting plot
+    ax.set_xlim(-5, 5)
+    ax.set_ylim(-3, 4)
+    ax.set_aspect('equal')
+    ax.axis('off')
+    ax.legend(loc='upper left', fontsize=9, framealpha=0.9)
+    
+    plt.tight_layout()
+    return fig
+
+# Tampilkan diagram
+fig_prisma = create_prisma_diagram()
+st.pyplot(fig_prisma)
+plt.close(fig_prisma)
+
+# Keterangan
 st.markdown("""
 <div style='background: white; padding: 20px; border-radius: 10px; border: 2px solid #667eea;'>
-
-**Diagram Skematik Dispersi Cahaya pada Prisma:**
-
-<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/Prism_rainbow.svg/800px-Prism_rainbow.svg.png" 
-     alt="Prisma Dispersi" 
-     style="width: 100%; max-width: 600px; display: block; margin: 20px auto;">
 
 **Keterangan Simbol:**
 
@@ -288,57 +371,14 @@ st.markdown("""
 
 **Alur Cahaya:**
 
-1. 🔦 Sinar putih datang dari kiri → memasuki prisma
-2. 🔄 Dibiaskan pertama kali (i₁ → r₁) 
-3. 🌈 Terjadi dispersi: setiap warna punya indeks bias berbeda
-4. 🔄 Dibiaskan kedua kali (i₂ → r₂) saat keluar prisma
-5. 🎨 Spektrum warna terpisah di luar prisma
+1. 🔦 **Sinar putih** datang dari kiri → memasuki prisma
+2. 🔄 **Dibiaskan pertama kali** (i₁ → r₁) - sinar membelok ke arah normal
+3. 🌈 **Terjadi dispersi** - setiap warna punya indeks bias berbeda
+4. 🔄 **Dibiaskan kedua kali** (i₂ → r₂) saat keluar prisma - sinar membelok menjauhi normal
+5. 🎨 **Spektrum warna terpisah** di luar prisma (merah, jingga, kuning, hijau, biru, nila, ungu)
 
 </div>
 """, unsafe_allow_html=True)
-
-# Ilustrasi sederhana dengan matplotlib
-def create_static_illustration(prism_angle, incident_angle, n_value):
-    """Membuat ilustrasi statis sederhana"""
-    fig, ax = plt.subplots(figsize=(8, 5), dpi=100)
-    
-    apex = np.array([0, 3])
-    base_left = np.array([-2.5, 0])
-    base_right = np.array([2.5, 0])
-    prism = Polygon([apex, base_left, base_right], 
-                    fill=True, alpha=0.2, edgecolor='black', facecolor='skyblue')
-    ax.add_patch(prism)
-    
-    entry = base_left + 0.4 * (apex - base_left)
-    ax.plot([-4, entry[0]], [-1, entry[1]], 'k-', linewidth=2)
-    
-    exit_point = apex + 0.5 * (base_right - apex)
-    ax.plot([entry[0], exit_point[0]], [entry[1], exit_point[1]], 
-            'b-', linewidth=1.5, alpha=0.7)
-    
-    spectrum_colors = ['#FF0000', '#FFA500', '#FFFF00', '#00FF00', '#0000FF', '#9400D3']
-    for i, color in enumerate(spectrum_colors):
-        angle_offset = -0.1 + i * 0.04
-        ax.plot([exit_point[0], exit_point[0] + 3], 
-                [exit_point[1], exit_point[1] - 1 + angle_offset],
-                color=color, linewidth=2, alpha=0.8)
-    
-    ax.text(entry[0]-0.8, entry[1]+0.3, 'i₁', fontsize=10, fontweight='bold')
-    ax.text(entry[0]+0.3, entry[1]-0.3, 'r₁', fontsize=10, fontweight='bold')
-    ax.text(exit_point[0]-0.4, exit_point[1]-0.3, 'i₂', fontsize=10, fontweight='bold')
-    ax.text(exit_point[0]+0.5, exit_point[1]+0.2, 'r₂', fontsize=10, fontweight='bold')
-    ax.text(0, 3.3, f'A={prism_angle}°', fontsize=10, ha='center')
-    
-    ax.set_xlim(-5, 5)
-    ax.set_ylim(-1, 4.5)
-    ax.set_aspect('equal')
-    ax.axis('off')
-    plt.tight_layout()
-    return fig
-
-fig_static = create_static_illustration(prism_angle, incident_angle, refractive_index)
-st.pyplot(fig_static)
-plt.close(fig_static)
 
 # ============================================================================
 # FORMULASI MATEMATIS
