@@ -1018,21 +1018,20 @@ plt.tight_layout()
 st.pyplot(fig_n)
 plt.close(fig_n)
 
-st.markdown('<div class="info-box">', unsafe_allow_html=True)
-
-st.markdown("#### 💡 Interpretasi Grafik:")
 st.markdown("""
+<div class="info-box">
+
+#### 💡 Interpretasi Grafik:
+
 - Semakin **besar indeks bias (n)**, semakin **besar sudut deviasi (δ)**
 - Cahaya dengan **panjang gelombang lebih pendek** (biru) memiliki indeks bias lebih besar → deviasi lebih besar
 - **Dispersi** = perbedaan deviasi antar warna → spektrum terpisah
-""")
 
-st.markdown("#### 📐 Rumus Sudut Deviasi Minimum:")
+#### 📐 Rumus Sudut Deviasi Minimum:
 
-# Gunakan st.latex() untuk persamaan LaTeX
-st.latex(r"\delta_{\text{min}} = 2 \cdot \arcsin\left(n \cdot \sin\left(\frac{A}{2}\right)\right) - A")
-
-st.markdown('</div>', unsafe_allow_html=True)
+</div>
+""", unsafe_allow_html=True)
+st.latex(r"\delta_{\text{min}} = 2 \cdot \arcsin\left(n \cdot \sin\left(\frac{A}{2}\right)\right) - β")
 
 st.markdown("""
 <div class="info-box" style="background: var(--bg-warning);">
