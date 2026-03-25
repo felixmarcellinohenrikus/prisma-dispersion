@@ -271,7 +271,7 @@ st.markdown("---")
 st.markdown("### 🔍 Ilustrasi Ray Tracing pada Prisma")
 
 # Path gambar di repository
-image_path = "images/prisma_diagram.jpg"
+image_path = "images/prisma_diagram.png"
 
 # Cek apakah file ada
 import os
