@@ -227,6 +227,108 @@ st.markdown("""
     }
 
     /* ========================================
+     * SIDEBAR - DARK MODE FIX (WHITE TEXT)
+     * ======================================== */
+    
+    /* Sidebar container */
+    section[data-testid="stSidebar"],
+    div[data-testid="stSidebar"] {
+        background-color: var(--bg-secondary) !important;
+    }
+    
+    /* Sidebar headings */
+    section[data-testid="stSidebar"] h1,
+    section[data-testid="stSidebar"] h2,
+    section[data-testid="stSidebar"] h3,
+    section[data-testid="stSidebar"] h4,
+    section[data-testid="stSidebar"] h5,
+    section[data-testid="stSidebar"] h6,
+    div[data-testid="stSidebar"] h1,
+    div[data-testid="stSidebar"] h2,
+    div[data-testid="stSidebar"] h3,
+    div[data-testid="stSidebar"] h4 {
+        color: var(--text-primary) !important;
+        font-weight: bold;
+    }
+    
+    /* Sidebar labels (slider labels, selectbox labels, etc.) */
+    section[data-testid="stSidebar"] label,
+    div[data-testid="stSidebar"] label,
+    section[data-testid="stSidebar"] .stMarkdown,
+    div[data-testid="stSidebar"] .stMarkdown,
+    section[data-testid="stSidebar"] p,
+    div[data-testid="stSidebar"] p,
+    section[data-testid="stSidebar"] strong,
+    div[data-testid="stSidebar"] strong {
+        color: var(--text-primary) !important;
+    }
+    
+    /* Sidebar slider text */
+    section[data-testid="stSidebar"] .stSlider label,
+    section[data-testid="stSidebar"] .stSlider div,
+    div[data-testid="stSidebar"] .stSlider label,
+    div[data-testid="stSidebar"] .stSlider div {
+        color: var(--text-primary) !important;
+    }
+    
+    /* Sidebar selectbox/dropdown */
+    section[data-testid="stSidebar"] .stSelectbox label,
+    section[data-testid="stSidebar"] .stSelectbox div,
+    div[data-testid="stSidebar"] .stSelectbox label,
+    div[data-testid="stSidebar"] .stSelectbox div {
+        color: var(--text-primary) !important;
+    }
+    
+    /* Sidebar checkbox */
+    section[data-testid="stSidebar"] .stCheckbox label,
+    section[data-testid="stSidebar"] .stCheckbox div,
+    div[data-testid="stSidebar"] .stCheckbox label,
+    div[data-testid="stSidebar"] .stCheckbox div {
+        color: var(--text-primary) !important;
+    }
+    
+    /* Sidebar info box */
+    section[data-testid="stSidebar"] .stAlert,
+    div[data-testid="stSidebar"] .stAlert,
+    section[data-testid="stSidebar"] div[role="alert"],
+    div[data-testid="stSidebar"] div[role="alert"] {
+        background-color: var(--bg-info) !important;
+        color: var(--text-primary) !important;
+    }
+    
+    section[data-testid="stSidebar"] .stAlert p,
+    section[data-testid="stSidebar"] .stAlert strong,
+    div[data-testid="stSidebar"] .stAlert p,
+    div[data-testid="stSidebar"] .stAlert strong {
+        color: var(--text-primary) !important;
+    }
+    
+    /* Dark mode specific overrides */
+    [data-theme="dark"] section[data-testid="stSidebar"],
+    [data-theme="dark"] div[data-testid="stSidebar"] {
+        background-color: #262730 !important;
+    }
+    
+    [data-theme="dark"] section[data-testid="stSidebar"] *,
+    [data-theme="dark"] div[data-testid="stSidebar"] * {
+        color: #ffffff !important;
+    }
+    
+    [data-theme="dark"] section[data-testid="stSidebar"] label,
+    [data-theme="dark"] div[data-testid="stSidebar"] label {
+        color: #e0e0e0 !important;
+    }
+    
+    [data-theme="dark"] section[data-testid="stSidebar"] h1,
+    [data-theme="dark"] section[data-testid="stSidebar"] h2,
+    [data-theme="dark"] section[data-testid="stSidebar"] h3,
+    [data-theme="dark"] div[data-testid="stSidebar"] h1,
+    [data-theme="dark"] div[data-testid="stSidebar"] h2,
+    [data-theme="dark"] div[data-testid="stSidebar"] h3 {
+        color: #ffffff !important;
+    }
+    
+    /* ========================================
      * GENERAL
      * ======================================== */
     .stApp {
@@ -588,65 +690,70 @@ if results:
     df_display['Indeks Bias (n)'] = df_display['Indeks Bias (n)'].round(4)
     df_display['Sudut Deviasi (°)'] = df_display['Sudut Deviasi (°)'].round(2)
     
-    # Custom styling untuk tabel
-    st.markdown("""
-    <style>
-    .custom-table {
-        border-collapse: collapse;
-        width: 100%;
-        margin: 20px 0;
-        font-size: 14px;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    }
+    # Display dengan styling
+    st.dataframe(
+        df_display,
+        use_container_width=True,
+        hide_index=True,
+        column_config={
+            "Warna": st.column_config.TextColumn(width="small"),
+            "λ (nm)": st.column_config.NumberColumn(width="small"),
+            "Indeks Bias (n)": st.column_config.NumberColumn(format="%.4f"),
+            "Sudut Deviasi (°)": st.column_config.NumberColumn(format="%.2f")
+        }
+    )
+
+st.markdown("""
+<style>
+    /* ========================================
+     * TABLE - ALL CONTENT TOP-CENTER
+     * ======================================== */
     
-    .custom-table thead tr {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        text-align: center;
+    /* Header tabel - center & middle */
+    .stDataFrame thead th,
+    div[data-testid="stDataFrame"] thead th,
+    table thead th {
+        text-align: center !important;
+        vertical-align: middle !important;
+        padding: 15px 10px !important;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+        color: #ffffff !important;
         font-weight: bold;
+        border: 1px solid #ffffff30 !important;
     }
     
-    .custom-table th,
-    .custom-table td {
-        padding: 12px 15px;
-        border: 1px solid #ddd;
+    /* Body tabel - center & top */
+    .stDataFrame tbody td,
+    div[data-testid="stDataFrame"] tbody td,
+    table tbody td {
+        text-align: center !important;
+        vertical-align: top !important;
+        padding: 12px 10px !important;
+        color: var(--text-primary) !important;
+        border: 1px solid #e0e0e0 !important;
     }
     
-    .custom-table tbody tr {
-        border-bottom: 1px solid #ddd;
+    /* Alternating row colors */
+    .stDataFrame tbody tr:nth-child(odd) td {
+        background-color: var(--bg-primary);
     }
     
-    .custom-table tbody tr:nth-of-type(even) {
-        background-color: #f8f9fa;
+    .stDataFrame tbody tr:nth-child(even) td {
+        background-color: var(--bg-secondary);
     }
     
-    .custom-table tbody tr:hover {
-        background-color: #e8f4f8;
-        cursor: pointer;
+    /* Dark mode border adjustment */
+    [data-theme="dark"] .stDataFrame tbody td,
+    [data-theme="dark"] div[data-testid="stDataFrame"] tbody td {
+        border-color: #4a5568 !important;
     }
     
-    /* Dark mode untuk custom table */
-    [data-theme="dark"] .custom-table tbody tr:nth-of-type(even) {
-        background-color: #262730;
+    [data-theme="dark"] .stDataFrame thead th,
+    [data-theme="dark"] div[data-testid="stDataFrame"] thead th {
+        border-color: #ffffff30 !important;
     }
-    
-    [data-theme="dark"] .custom-table tbody tr:hover {
-        background-color: #2d3748;
-    }
-    
-    [data-theme="dark"] .custom-table th,
-    [data-theme="dark"] .custom-table td {
-        border-color: #4a5568;
-    }
-    </style>
-    """, unsafe_allow_html=True)
-    
-    # Render tabel dengan HTML custom
-    html_table = df_display.to_html(index=False, classes='custom-table', border=0)
-    st.markdown(html_table, unsafe_allow_html=True)
-    
-    # Atau tetap gunakan st.dataframe dengan styling
-    # st.dataframe(df_display, use_container_width=True, hide_index=True)
+</style>
+""", unsafe_allow_html=True)
 
 # ============================================================================
 # GRAFIK: CAUCHY VS SELLMEIER (DINAMIS - TERGANTUNG MATERIAL)
