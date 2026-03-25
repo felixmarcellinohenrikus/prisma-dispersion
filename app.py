@@ -653,17 +653,17 @@ st.pyplot(fig_n)
 plt.close(fig_n)
 
 # Penjelasan
-st.markdown("""
+st.markdown("
 <div style='background: #e8f4f8; padding: 15px; border-radius: 8px; margin-top: 10px;'>
 
-**💡 Interpretasi Grafik:**
+Interpretasi Grafik:
 - Semakin **besar indeks bias (n)**, semakin **besar sudut deviasi (δ)**
 - Cahaya dengan **panjang gelombang lebih pendek** (biru) memiliki indeks bias lebih besar → deviasi lebih besar
 - **Dispersi** = perbedaan deviasi antar warna → spektrum terpisah
 
 **📐 Rumus Sudut Deviasi Minimum:**
 $$\delta_{\text{min}} = 2 \cdot \arcsin\!\big(n \cdot \sin(A/2)\big) - A$$
-
+", unsafe_allow_html=True)
 # ============================================================================
 # GRAFIK: DISPERSI - INDEKS BIAS vs PANJANG GELOMBANG
 # ============================================================================
