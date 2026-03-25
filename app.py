@@ -1029,7 +1029,7 @@ st.markdown("""
 
 #### 📐 Rumus Sudut Deviasi Minimum:
 
-$$\\delta_{\\text{min}} = 2 \\cdot \\arcsin\\left(n \\cdot \\sin\\left(\\frac{A}{2}\\right)\\right) - β$$
+$\\delta_{\\text{min}} = 2 \\cdot \\arcsin\\left(n \\cdot \\sin\\left(\\frac{A}{2}\\right)\\right) - β$
 
 </div>
 """, unsafe_allow_html=True)
