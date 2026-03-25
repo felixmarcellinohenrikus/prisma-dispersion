@@ -6,6 +6,10 @@ import matplotlib.pyplot as plt
 from matplotlib.patches import Polygon
 import warnings
 import pandas as pd
+import base64
+from PIL import Image
+import io
+import requests
 
 warnings.filterwarnings('ignore')
 
@@ -266,93 +270,20 @@ else:
 st.markdown("---")
 st.markdown("### 🔍 Ilustrasi Ray Tracing pada Prisma")
 
-def create_prisma_diagram():
-    """Membuat diagram prisma yang informatif"""
-    fig, ax = plt.subplots(figsize=(10, 6), dpi=100)
-    
-    # Prisma segitiga
-    prism_x = [-2, 2, 0, -2]
-    prism_y = [-2, -2, 2.5, -2]
-    prism = Polygon([[-2, -2], [2, -2], [0, 2.5]], 
-                    fill=True, alpha=0.2, edgecolor='black', 
-                    linewidth=2, facecolor='skyblue')
-    ax.add_patch(prism)
-    
-    # Titik masuk dan keluar
-    entry_point = np.array([-1.2, -0.5])
-    exit_point = np.array([1.0, 0.8])
-    
-    # Sinar datang (hitam)
-    ax.plot([-4, entry_point[0]], [-2, entry_point[1]], 
-            'k-', linewidth=2.5, label='Sinar Datang')
-    
-    # Sinar dalam prisma (biru)
-    ax.plot([entry_point[0], exit_point[0]], 
-            [entry_point[1], exit_point[1]], 
-            'b-', linewidth=2, alpha=0.7, label='Sinar dalam Prisma')
-    
-    # Spektrum keluar (warna-warni)
-    spectrum_colors = ['#FF0000', '#FF7F00', '#FFFF00', '#00FF00', '#0000FF', '#9400D3']
-    spectrum_labels = ['Merah', 'Jingga', 'Kuning', 'Hijau', 'Biru', 'Ungu']
-    
-    for i, (color, label) in enumerate(zip(spectrum_colors, spectrum_labels)):
-        angle_offset = -0.15 + i * 0.06
-        end_x = exit_point[0] + 3 * np.cos(angle_offset)
-        end_y = exit_point[1] + 3 * np.sin(angle_offset)
-        ax.plot([exit_point[0], end_x], [exit_point[1], end_y], 
-                color=color, linewidth=2, alpha=0.8, label=label if i < 4 else "")
-    
-    # Garis normal (putus-putus)
-    normal_len = 1.0
-    # Normal di entry
-    ax.plot([entry_point[0] - 0.8, entry_point[0] + 0.8], 
-            [entry_point[1] - 0.3, entry_point[1] + 0.3], 
-            'k--', linewidth=1, alpha=0.5)
-    # Normal di exit
-    ax.plot([exit_point[0] - 0.5, exit_point[0] + 0.5], 
-            [exit_point[1] - 0.4, exit_point[1] + 0.4], 
-            'k--', linewidth=1, alpha=0.5)
-    
-    # Label sudut
-    ax.text(entry_point[0]-0.9, entry_point[1]+0.4, 'i₁', fontsize=11, fontweight='bold')
-    ax.text(entry_point[0]+0.2, entry_point[1]-0.3, 'r₁', fontsize=11, fontweight='bold')
-    ax.text(exit_point[0]-0.6, exit_point[1]-0.5, 'i₂', fontsize=11, fontweight='bold')
-    ax.text(exit_point[0]+0.3, exit_point[1]+0.5, 'r₂', fontsize=11, fontweight='bold')
-    ax.text(0, 2.7, 'A', fontsize=11, fontweight='bold', ha='center')
-    
-    # Busur sudut A
-    arc_A = np.linspace(np.pi/3, 2*np.pi/3, 30)
-    ax.plot(0.5*np.cos(arc_A), 2.5 + 0.5*np.sin(arc_A), 'k-', linewidth=1.5)
-    
-    # Perpanjangan sinar datang (titik-titik)
-    ax.plot([entry_point[0], entry_point[0] + 4], 
-            [entry_point[1], entry_point[1] + 1.5], 
-            'k:', linewidth=1, alpha=0.4)
-    
-    # Label deviasi
-    ax.text(2.5, 1.8, 'δ', fontsize=12, fontweight='bold', color='red')
-    
-    # Busur deviasi
-    dev_center = np.array([2.0, 1.0])
-    dev_arc = np.linspace(0.1, 0.6, 30)
-    ax.plot(dev_center[0] + 2.0*np.cos(dev_arc), 
-            dev_center[1] + 2.0*np.sin(dev_arc), 
-            'r--', linewidth=1.5)
-    
-    # Setting plot
-    ax.set_xlim(-5, 5)
-    ax.set_ylim(-3, 4)
-    ax.set_aspect('equal')
-    ax.axis('off')
-    ax.legend(loc='upper left', fontsize=9, framealpha=0.9)
-    
-    plt.tight_layout()
-    return fig
+# Download dan encode gambar
+try:
+    response = requests.get("https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/Prism_rainbow.svg/800px-Prism_rainbow.svg.png")
+    img_base64 = base64.b64encode(response.content).decode()
+    img_html = f'<img src="data:image/png;base64,{img_base64}" alt="Prisma" style="width:100%; max-width:600px;">'
+except:
+    img_html = "<p>⚠️ Gambar tidak tersedia</p>"
 
-# Tampilkan diagram
-fig_prisma = create_prisma_diagram()
-st.pyplot(fig_prisma)
-plt.close(fig_prisma)
+st.markdown(f"""
+<div style='background: white; padding: 20px; border-radius: 10px;'>
+**Diagram Skematik Dispersi Cahaya pada Prisma:**
+{img_html}
+</div>
+""", unsafe_allow_html=True)
 
 # Keterangan
 st.markdown("""
