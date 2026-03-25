@@ -717,12 +717,11 @@ st.markdown("""
 # FOOTER
 # ============================================================================
 st.markdown("---")
-st.markdown(
-    """
-    <div class="footer">
-        <h4>Simulasi Dispersi Cahaya pada Prisma</h4>
-        <p><em>Dikembangkan oleh Felix Marcellino Henrikus, S.Si.</em></p>
-        <p>Untuk pembelajaran Optika Geometri di Fisika UKSW Salatiga</p>
-    </div>
-    """,
-    unsafe_allow_html=True)
+footer_html = """
+<div class="footer">
+    <h4>Simulasi Dispersi Cahaya pada Prisma</h4>
+    <p><em>Dikembangkan oleh Felix Marcellino Henrikus, S.Si.</em></p>
+    <p>Untuk pembelajaran Optika Geometri di Fisika UKSW Salatiga</p>
+</div>
+"""
+st.markdown(footer_html, unsafe_allow_html=True)
