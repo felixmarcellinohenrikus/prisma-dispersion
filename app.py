@@ -174,6 +174,33 @@ prism_angle = st.sidebar.slider(
     help="Sudut apex prisma (default 60° untuk prisma sama kaki)"
 )
 
+# Slider untuk indeks bias (range umum kaca: 1.4 - 1.9)
+refractive_index = st.sidebar.slider(
+    "Indeks Bias (n)",
+    min_value=1.40,
+    max_value=1.90,
+    value=1.52,
+    step=0.01,
+    help="Nilai indeks bias material prisma (kaca: ~1.5, flint: ~1.6-1.9)"
+)
+
+# Pilihan material preset
+material_preset = st.sidebar.selectbox(
+    "Preset Material",
+    ["Custom", "Kaca Crown (n=1.52)", "Kaca Flint (n=1.65)", "Safir (n=1.77)", "Berlian (n=2.42)"],
+    index=1
+)
+
+# Update indeks bias berdasarkan preset
+if material_preset != "Custom":
+    preset_values = {
+        "Kaca Crown (n=1.52)": 1.52,
+        "Kaca Flint (n=1.65)": 1.65,
+        "Safir (n=1.77)": 1.77,
+        "Berlian (n=2.42)": 2.42
+    }
+    refractive_index = preset_values[material_preset]
+    
 dispersion_model = st.sidebar.selectbox(
     "📊 Model Dispersi",
     ['Cauchy', 'Sellmeier'],
@@ -258,325 +285,88 @@ else:
     st.warning("💡 **Saran:** Gunakan sudut datang antara 30°-60° dan sudut prisma 60° untuk visualisasi yang ideal.")
 
 # ============================================================================
-# VISUALISASI RAY TRACING
+# ILUSTRASI STATIS RAY TRACING
 # ============================================================================
 st.markdown("---")
-st.markdown("### 🔍 Visualisasi Ray Tracing")
+st.markdown("### 🔍 Ilustrasi Ray Tracing pada Prisma")
 
-if results:
-    def create_ray_tracing_plot(incident_angle, prism_angle, results, show_spectrum, show_angles):
-        fig, ax = plt.subplots(figsize=(11, 7), dpi=100)
-        fig.patch.set_facecolor('#f8f9fa')
-        ax.set_facecolor('#ffffff')
-        
-        # PRISM GEOMETRY
-        prism_height = 4.5
-        apex_x, apex_y = 0, prism_height
-        base_width = prism_height * 2 * np.tan(np.radians(prism_angle/2))
-        base_left_x, base_y = -base_width/2, 0
-        base_right_x, _ = base_width/2, 0
-        
-        prism = Polygon([[apex_x, apex_y], [base_left_x, base_y], [base_right_x, base_y]],
-                        fill=True, alpha=0.2, edgecolor='black', linewidth=1.5, facecolor='skyblue')
-        ax.add_patch(prism)
-        
-        # LEFT FACE NORMAL (pointing OUT of prism)
-        left_face_dx = apex_x - base_left_x
-        left_face_dy = apex_y - base_y
-        left_face_len = np.sqrt(left_face_dx**2 + left_face_dy**2)
-        
-        normal_left_x = -left_face_dy / left_face_len
-        normal_left_y = left_face_dx / left_face_len
-        normal_left_angle = np.arctan2(normal_left_y, normal_left_x)
-        
-        # RIGHT FACE NORMAL (pointing OUT of prism)
-        right_face_dx = base_right_x - apex_x
-        right_face_dy = base_y - apex_y
-        right_face_len = np.sqrt(right_face_dx**2 + right_face_dy**2)
-        
-        normal_right_x = right_face_dy / right_face_len
-        normal_right_y = -right_face_dx / right_face_len
-        normal_right_angle = np.arctan2(normal_right_y, normal_right_x)
-        
-        # ENTRY POINT (35% from base up left face)
-        t_entry = 0.35
-        entry_x = base_left_x + t_entry * left_face_dx
-        entry_y = base_y + t_entry * left_face_dy
-        
-        # INCIDENT RAY - DIPERBAIKI: dari KIRI menuju prisma
-        i1_rad = np.radians(incident_angle)
-        
-        # Sinar datang dari KIRI, menuju entry point
-        # Arah sinar: normal - i1 (karena datang dari kiri)
-        incident_ray_angle = normal_left_angle + np.pi + i1_rad
-        
-        incident_len = 4.0
-        # Sinar datang: dari incident_start MENUJU entry point
-        incident_start_x = entry_x - incident_len * np.cos(incident_ray_angle)
-        incident_start_y = entry_y - incident_len * np.sin(incident_ray_angle)
-        
-        # Draw incident ray (BLACK, SOLID) - datang dari kiri
-        ax.plot([incident_start_x, entry_x], [incident_start_y, entry_y],
-                'k-', linewidth=2.5, label='Sinar Datang', zorder=5)
-        
-        # Extension FORWARD (dotted) - perpanjangan sinar datang jika tidak dibiaskan
-        ext_len = 5.0
-        ext_end_x = entry_x + ext_len * np.cos(incident_ray_angle)
-        ext_end_y = entry_y + ext_len * np.sin(incident_ray_angle)
-        ax.plot([entry_x, ext_end_x], [entry_y, ext_end_y],
-                'k:', linewidth=0.8, alpha=0.4, zorder=1)
-        
-        # REFRACTED RAY INSIDE (r1)
-        n_red = results[0]['n']
-        r1_rad = np.arcsin(np.sin(i1_rad) / n_red)
-        
-        # Internal ray direction (bends TOWARD normal)
-        internal_ray_angle = normal_left_angle - r1_rad
-        
-        internal_dir_x = np.cos(internal_ray_angle)
-        internal_dir_y = np.sin(internal_ray_angle)
-        
-        # Find exit point on right face
-        t_max = 10
-        exit_x, exit_y = None, None
-        for t in np.linspace(0.1, t_max, 500):
-            test_x = entry_x + t * internal_dir_x
-            test_y = entry_y + t * internal_dir_y
-            
-            val1 = (test_x - apex_x) * (base_y - apex_y) - (test_y - apex_y) * (base_right_x - apex_x)
-            val2 = (entry_x + (t+0.1) * internal_dir_x - apex_x) * (base_y - apex_y) - \
-                   (entry_y + (t+0.1) * internal_dir_y - apex_y) * (base_right_x - apex_x)
-            
-            if val1 * val2 <= 0:
-                exit_x, exit_y = test_x, test_y
-                break
-        
-        if exit_x is None:
-            exit_x = apex_x + 0.5 * (base_right_x - apex_x)
-            exit_y = apex_y + 0.5 * (base_y - apex_y)
-        
-        # Draw internal ray (dark blue)
-        ax.plot([entry_x, exit_x], [entry_y, exit_y],
-                color='#1E3A8A', linewidth=2, alpha=0.8, zorder=4)
-        
-        # EMERGENT RAYS (spectrum) - DITAMBAHKAN
-        exit_data = []
-        
-        for i, res in enumerate(results):
-            if not show_spectrum and i not in [0, len(results)//2, len(results)-1]:
-                continue
-            
-            n_wl = res['n']
-            i2_val = res['i2']
-            i2_rad = np.radians(i2_val)
-            
-            # Snell at exit: n*sin(i2) = 1*sin(r2)
-            sin_r2 = n_wl * np.sin(i2_rad)
-            if sin_r2 > 1:
-                continue
-            r2_rad = np.arcsin(sin_r2)
-            
-            # Emergent ray direction (bends AWAY from normal)
-            emergent_angle = normal_right_angle - r2_rad
-            
-            emergent_len = 4.0
-            final_x = exit_x + emergent_len * np.cos(emergent_angle)
-            final_y = exit_y + emergent_len * np.sin(emergent_angle)
-            
-            exit_data.append({
-                'exit_x': exit_x, 'exit_y': exit_y,
-                'final_x': final_x, 'final_y': final_y,
-                'emergent_angle': emergent_angle,
-                'r2_rad': r2_rad,
-                'color': res['color'] if show_spectrum else 'k',
-                'label': res['warna'] if show_spectrum and i < 3 else "",
-                'delta': res['delta']
-            })
-            
-            # Draw emergent ray (COLOR spectrum)
-            ax.plot([exit_x, final_x], [exit_y, final_y],
-                    color=res['color'] if show_spectrum else 'k',
-                    linewidth=2.5, alpha=0.9,
-                    label=res['warna'] if show_spectrum and i < 3 else "", zorder=5)
-            
-            # Backward extension (dotted)
-            back_x = exit_x - 2.0 * np.cos(emergent_angle)
-            back_y = exit_y - 2.0 * np.sin(emergent_angle)
-            ax.plot([exit_x, back_x], [exit_y, back_y],
-                    color=res['color'] if show_spectrum else 'k',
-                    linewidth=0.5, alpha=0.25, linestyle=':', zorder=1)
-        
-        # NORMAL LINES
-        normal_len = 1.0
-        
-        ax.plot([entry_x - normal_len * normal_left_x,
-                 entry_x + normal_len * normal_left_x],
-                [entry_y - normal_len * normal_left_y,
-                 entry_y + normal_len * normal_left_y],
-                'k--', linewidth=1, alpha=0.5, zorder=2)
-        
-        ax.plot([exit_x - normal_len * normal_right_x,
-                 exit_x + normal_len * normal_right_x],
-                [exit_y - normal_len * normal_right_y,
-                 exit_y + normal_len * normal_right_y],
-                'k--', linewidth=1, alpha=0.5, zorder=2)
-        
-        # ANGLE LABELS
-        if show_angles:
-            arc_r = 0.35
-            
-            # i₁ - OUTSIDE (antara sinar datang dan normal)
-            start_i1 = np.pi - incident_ray_angle
-            end_i1 = normal_left_angle
-            
-            # Hitung selis sudut
-            angle_diff = end_i1 - start_i1
-            
-            # Normalisasi ke range [-π, π]
-            while angle_diff > np.pi:
-                angle_diff -= 2*np.pi
-            while angle_diff < -np.pi:
-                angle_diff += 2*np.pi
-            
-            # Pastikan busur selalu positif (menggambar ke arah yang benar)
-            if angle_diff < 0:
-                start_i1, end_i1 = end_i1, start_i1
-                angle_diff = -angle_diff
-            
-            # Draw arc
-            arc_i1 = np.linspace(start_i1, end_i1, 50)
-            ax.plot(entry_x + arc_r * np.cos(arc_i1),
-                    entry_y + arc_r * np.sin(arc_i1),
-                    'k-', linewidth=1.8, zorder=6)
-            
-            # r₁ - INSIDE (antara sinar dalam dan normal)
-            start_r1 = normal_left_angle
-            end_r1 = internal_ray_angle
-            
-            while abs(end_r1 - start_r1) > np.pi:
-                if end_r1 > start_r1:
-                    end_r1 -= 2*np.pi
-                else:
-                    start_r1 -= 2*np.pi
-            
-            arc_r1 = np.linspace(start_r1, end_r1, 50)
-            ax.plot(entry_x + arc_r * 0.55 * np.cos(arc_r1),
-                    entry_y + arc_r * 0.55 * np.sin(arc_r1),
-                    'k-', linewidth=1.8, zorder=6)
-            
-            mid_r1 = (start_r1 + end_r1) / 2
-            ax.text(entry_x + (arc_r * 0.55 + 0.1) * np.cos(mid_r1),
-                    entry_y + (arc_r * 0.55 + 0.1) * np.sin(mid_r1),
-                    'r₁', fontsize=11, fontweight='bold', color='black',
-                    ha='center', va='center', zorder=7)
-            
-            # i₂ - INSIDE (antara sinar dalam dan normal kanan) - DITAMBAHKAN
-            if exit_data:
-                internal_exit_angle = np.arctan2(exit_y - entry_y, exit_x - entry_x)
-                normal_right_in = normal_right_angle + np.pi
-                
-                start_i2 = normal_right_in
-                end_i2 = internal_exit_angle
-                
-                while abs(end_i2 - start_i2) > np.pi:
-                    if end_i2 > start_i2:
-                        end_i2 -= 2*np.pi
-                    else:
-                        start_i2 -= 2*np.pi
-                
-                arc_i2 = np.linspace(start_i2, end_i2, 50)
-                ax.plot(exit_x + arc_r * 0.55 * np.cos(arc_i2),
-                        exit_y + arc_r * 0.55 * np.sin(arc_i2),
-                        'k-', linewidth=1.8, zorder=6)
-                
-                mid_i2 = (start_i2 + end_i2) / 2
-                ax.text(exit_x + (arc_r * 0.55 + 0.1) * np.cos(mid_i2),
-                        exit_y + (arc_r * 0.55 + 0.1) * np.sin(mid_i2),
-                        'i₂', fontsize=11, fontweight='bold', color='black',
-                        ha='center', va='center', zorder=7)
-                
-                # r₂ - OUTSIDE (antara sinar keluar dan normal kanan) - DITAMBAHKAN
-                r2_rad = exit_data[0]['r2_rad']
-                emergent_angle = exit_data[0]['emergent_angle']
-                
-                start_r2 = normal_right_angle
-                end_r2 = emergent_angle
-                
-                while abs(end_r2 - start_r2) > np.pi:
-                    if end_r2 > start_r2:
-                        end_r2 -= 2*np.pi
-                    else:
-                        start_r2 -= 2*np.pi
-                
-                arc_r2 = np.linspace(start_r2, end_r2, 50)
-                ax.plot(exit_x + arc_r * 0.55 * np.cos(arc_r2),
-                        exit_y + arc_r * 0.55 * np.sin(arc_r2),
-                        'k-', linewidth=1.8, zorder=6)
-                
-                mid_r2 = (start_r2 + end_r2) / 2
-                ax.text(exit_x + (arc_r * 0.55 + 0.1) * np.cos(mid_r2),
-                        exit_y + (arc_r * 0.55 + 0.1) * np.sin(mid_r2),
-                        'r₂', fontsize=11, fontweight='bold', color='black',
-                        ha='center', va='center', zorder=7)
-            
-            # Prism angle A
-            left_side_angle = np.arctan2(base_y - apex_y, base_left_x - apex_x)
-            right_side_angle = np.arctan2(base_y - apex_y, base_right_x - apex_x)
-            
-            arc_A = np.linspace(right_side_angle, left_side_angle, 50)
-            ax.plot(apex_x + 0.6 * np.cos(arc_A),
-                    apex_y + 0.6 * np.sin(arc_A),
-                    'k-', linewidth=1.8, zorder=6)
-            ax.text(apex_x, apex_y - 0.8,
-                    f'A = {prism_angle:.1f}°', fontsize=11,
-                    fontweight='bold', color='black', ha='center', va='top', zorder=7)
-            
-            # Deviation δ - DITAMBAHKAN
-            if exit_data:
-                # δ = sudut antara perpanjangan sinar datang dan sinar keluar
-                incident_ext_angle = incident_ray_angle  # Arah perpanjangan
-                emergent_angle = exit_data[0]['emergent_angle']
-                
-                a1, a2 = incident_ext_angle, emergent_angle
-                while a1 > np.pi: a1 -= 2*np.pi
-                while a2 > np.pi: a2 -= 2*np.pi
-                while a1 < -np.pi: a1 += 2*np.pi
-                while a2 < -np.pi: a2 += 2*np.pi
-                
-                start_d, end_d = min(a1, a2), max(a1, a2)
-                
-                dev_cx = exit_x + 0.5
-                dev_cy = exit_y + 1.2
-                dev_r = 2.8
-                
-                arc_d = np.linspace(start_d, end_d, 50)
-                ax.plot(dev_cx + dev_r * np.cos(arc_d),
-                        dev_cy + dev_r * np.sin(arc_d),
-                        'k--', linewidth=1.8, zorder=6)
-                
-                mid_d = (start_d + end_d) / 2
-                ax.text(dev_cx + (dev_r + 0.3) * np.cos(mid_d),
-                        dev_cy + (dev_r + 0.3) * np.sin(mid_d),
-                        f'δ = {exit_data[0]["delta"]:.1f}°', fontsize=11,
-                        fontweight='bold', color='black',
-                        ha='center', va='center', zorder=7)
-        
-        ax.set_xlim(-6.5, 6.5)
-        ax.set_ylim(-0.5, 6)
-        ax.set_aspect('equal')
-        ax.axis('off')
-        
-        if show_spectrum:
-            ax.legend(loc='upper left', fontsize=9, framealpha=0.9, facecolor='white')
-        
-        plt.tight_layout()
-        return fig
-        
-    fig = create_ray_tracing_plot(incident_angle, prism_angle, results, show_spectrum, show_angles)
-    st.pyplot(fig)
-    plt.close(fig)
-else:
-    st.warning("⚠️ Visualisasi tidak dapat ditampilkan. Periksa parameter input.")
+st.markdown("""
+<div style='background: white; padding: 20px; border-radius: 10px; border: 2px solid #667eea;'>
+
+**Diagram Skematik Dispersi Cahaya pada Prisma:**
+
+<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/Prism_rainbow.svg/800px-Prism_rainbow.svg.png" 
+     alt="Prisma Dispersi" 
+     style="width: 100%; max-width: 600px; display: block; margin: 20px auto;">
+
+**Keterangan Simbol:**
+| Simbol | Deskripsi | Lokasi |
+|--------|-----------|--------|
+| **i₁** | Sudut datang | Luar prisma (sisi kiri) |
+| **r₁** | Sudut bias pertama | Dalam prisma (sisi kiri) |
+| **i₂** | Sudut datang kedua | Dalam prisma (sisi kanan) |
+| **r₂** | Sudut bias kedua | Luar prisma (sisi kanan) |
+| **A** | Sudut puncak prisma | Di apex prisma |
+| **δ** | Sudut deviasi | Antara perpanjangan sinar datang & sinar keluar |
+
+**Alur Cahaya:**
+1. 🔦 Sinar putih datang dari kiri → memasuki prisma
+2. 🔄 Dibiaskan pertama kali (i₁ → r₁) 
+3. 🌈 Terjadi dispersi: setiap warna punya indeks bias berbeda
+4. 🔄 Dibiaskan kedua kali (i₂ → r₂) saat keluar prisma
+5. 🎨 Spektrum warna terpisah di luar prisma
+
+</div>
+""", unsafe_allow_html=True)
+
+# Atau jika ingin membuat ilustrasi sederhana dengan matplotlib:
+def create_static_illustration(prism_angle, incident_angle, n_value):
+    """Membuat ilustrasi statis sederhana"""
+    fig, ax = plt.subplots(figsize=(8, 5), dpi=100)
+    
+    # Prism
+    apex = np.array([0, 3])
+    base_left = np.array([-2.5, 0])
+    base_right = np.array([2.5, 0])
+    prism = Polygon([apex, base_left, base_right], 
+                    fill=True, alpha=0.2, edgecolor='black', facecolor='skyblue')
+    ax.add_patch(prism)
+    
+    # Incident ray (simplified)
+    entry = base_left + 0.4 * (apex - base_left)
+    ax.plot([-4, entry[0]], [-1, entry[1]], 'k-', linewidth=2)
+    
+    # Internal ray
+    exit_point = apex + 0.5 * (base_right - apex)
+    ax.plot([entry[0], exit_point[0]], [entry[1], exit_point[1]], 
+            'b-', linewidth=1.5, alpha=0.7)
+    
+    # Emergent spectrum (simplified)
+    colors = ['#FF0000', '#FFA500', '#FFFF00', '#00FF00', '#0000FF', '#9400D3']
+    for i, color in enumerate(colors):
+        angle_offset = -0.1 + i * 0.04
+        ax.plot([exit_point[0], exit_point[0] + 3], 
+                [exit_point[1], exit_point[1] - 1 + angle_offset],
+                color=color, linewidth=2, alpha=0.8)
+    
+    # Labels
+    ax.text(entry[0]-0.8, entry[1]+0.3, 'i₁', fontsize=10, fontweight='bold')
+    ax.text(entry[0]+0.3, entry[1]-0.3, 'r₁', fontsize=10, fontweight='bold')
+    ax.text(exit_point[0]-0.4, exit_point[1]-0.3, 'i₂', fontsize=10, fontweight='bold')
+    ax.text(exit_point[0]+0.5, exit_point[1]+0.2, 'r₂', fontsize=10, fontweight='bold')
+    ax.text(0, 3.3, f'A={prism_angle}°', fontsize=10, ha='center')
+    
+    ax.set_xlim(-5, 5)
+    ax.set_ylim(-1, 4.5)
+    ax.set_aspect('equal')
+    ax.axis('off')
+    plt.tight_layout()
+    return fig
+
+# Tampilkan ilustrasi sederhana
+fig_static = create_static_illustration(prism_angle, incident_angle, 1.5)
+st.pyplot(fig_static)
+plt.close(fig_static)
 
 # ============================================================================
 # FORMULASI MATEMATIS
@@ -802,6 +592,126 @@ if np.sum(valid_mask) > 0:
     plt.close(fig3)
 else:
     st.warning("⚠️ Tidak ada data yang valid untuk grafik. Coba ubah sudut prisma menjadi lebih kecil (misalnya 60°).")
+
+# ============================================================================
+# GRAFIK: PENGARUH INDEKS BIAS TERHADAP SUDUT DEVIASI
+# ============================================================================
+st.markdown("---")
+st.markdown("### 📈 Pengaruh Indeks Bias terhadap Sudut Deviasi")
+
+# Generate data untuk plot
+n_values = np.linspace(1.4, 2.0, 100)
+wavelengths_plot = [700, 550, 400]  # Merah, Hijau, Biru
+colors_plot = ['#FF0000', '#00FF00', '#0000FF']
+labels_plot = ['Merah (700 nm)', 'Hijau (550 nm)', 'Biru (400 nm)']
+
+fig_n, ax_n = plt.subplots(figsize=(10, 6), dpi=100)
+
+for wl, color, label in zip(wavelengths_plot, colors_plot, labels_plot):
+    delta_values = []
+    for n in n_values:
+        # Hitung deviasi sederhana (pendekatan sudut minimum)
+        # δ_min = 2*arcsin(n*sin(A/2)) - A
+        A_rad = np.radians(prism_angle)
+        try:
+            sin_term = n * np.sin(A_rad / 2)
+            if sin_term <= 1:
+                delta_min = 2 * np.arcsin(sin_term) - A_rad
+                delta_values.append(np.degrees(delta_min))
+            else:
+                delta_values.append(np.nan)
+        except:
+            delta_values.append(np.nan)
+    
+    ax_n.plot(n_values, delta_values, color=color, linewidth=2.5, 
+              label=label, alpha=0.8)
+    
+    # Tambahkan marker untuk nilai saat ini
+    try:
+        sin_term = refractive_index * np.sin(A_rad / 2)
+        if sin_term <= 1:
+            delta_current = 2 * np.arcsin(sin_term) - A_rad
+            ax_n.scatter([refractive_index], [np.degrees(delta_current)], 
+                        color=color, s=100, zorder=5, edgecolors='black')
+    except:
+        pass
+
+# Garis vertikal untuk n saat ini
+ax_n.axvline(x=refractive_index, color='gray', linestyle='--', 
+             linewidth=1, alpha=0.5, label=f'n saat ini: {refractive_index:.2f}')
+
+ax_n.set_xlabel('Indeks Bias (n)', fontsize=12, fontweight='bold')
+ax_n.set_ylabel('Sudut Deviasi Minimum δ (°)', fontsize=12, fontweight='bold')
+ax_n.set_title('Hubungan Indeks Bias dan Sudut Deviasi', 
+               fontsize=14, fontweight='bold', pad=15)
+ax_n.legend(fontsize=10, loc='upper left')
+ax_n.grid(True, alpha=0.3, linestyle='--')
+ax_n.set_xlim(1.4, 2.0)
+
+plt.tight_layout()
+st.pyplot(fig_n)
+plt.close(fig_n)
+
+# Penjelasan
+st.markdown("""
+<div style='background: #e8f4f8; padding: 15px; border-radius: 8px; margin-top: 10px;'>
+
+**💡 Interpretasi Grafik:**
+- Semakin **besar indeks bias (n)**, semakin **besar sudut deviasi (δ)**
+- Cahaya dengan **panjang gelombang lebih pendek** (biru) memiliki indeks bias lebih besar → deviasi lebih besar
+- **Dispersi** = perbedaan deviasi antar warna → spektrum terpisah
+
+**📐 Rumus Sudut Deviasi Minimum:**
+$$\delta_{\text{min}} = 2 \cdot \arcsin\!\big(n \cdot \sin(A/2)\big) - A$$
+
+# ============================================================================
+# GRAFIK: DISPERSI - INDEKS BIAS vs PANJANG GELOMBANG
+# ============================================================================
+st.markdown("---")
+st.markdown("### 🌈 Kurva Dispersi: n vs λ")
+
+wavelength_range = np.linspace(380, 750, 100)
+
+# Hitung n(λ) untuk nilai dispersi yang berbeda
+B_values = [4.0e3, 5.0e3, 6.0e3]  # Koefisien dispersi berbeda
+labels_B = ['Dispersi Rendah', 'Dispersi Sedang', 'Dispersi Tinggi']
+colors_B = ['#2ECC71', '#F39C12', '#E74C3C']
+
+fig_disp, ax_disp = plt.subplots(figsize=(10, 6), dpi=100)
+
+for B, label, color in zip(B_values, labels_B, colors_B):
+    n_disp = [1.5 + B / (wl**2) for wl in wavelength_range]
+    ax_disp.plot(wavelength_range, n_disp, color=color, linewidth=2.5, 
+                 label=label, alpha=0.8)
+
+# Tambahkan titik spektrum
+for wl, color in zip([700, 620, 580, 530, 470, 420, 380], 
+                     ['#FF0000', '#FF7F00', '#FFFF00', '#00FF00', '#0000FF', '#4B0082', '#9400D3']):
+    n_val = 1.5 + 5000 / (wl**2)
+    ax_disp.scatter([wl], [n_val], color=color, s=80, edgecolors='black', zorder=5)
+
+ax_disp.set_xlabel('Panjang Gelombang λ (nm)', fontsize=12, fontweight='bold')
+ax_disp.set_ylabel('Indeks Bias (n)', fontsize=12, fontweight='bold')
+ax_disp.set_title('Ketergantungan Indeks Bias terhadap Panjang Gelombang', 
+                  fontsize=14, fontweight='bold', pad=15)
+ax_disp.legend(fontsize=10, loc='upper right')
+ax_disp.grid(True, alpha=0.3, linestyle='--')
+ax_disp.invert_xaxis()  # λ besar di kiri (konvensi optik)
+
+plt.tight_layout()
+st.pyplot(fig_disp)
+plt.close(fig_disp)
+
+st.markdown("""
+<div style='background: #fff3cd; padding: 15px; border-radius: 8px; margin-top: 10px;'>
+
+**📝 Catatan:**
+- Kurva menunjukkan **dispersi normal**: n menurun saat λ meningkat
+- **Dispersi tinggi** = kurva lebih curam = pemisahan warna lebih jelas
+- Material dengan dispersi tinggi (seperti flint glass) menghasilkan spektrum lebih lebar
+
+</div>
+""", unsafe_allow_html=True)
 
 # ============================================================================
 # FOOTER
