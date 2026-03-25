@@ -111,8 +111,8 @@ st.markdown("""
     div[data-testid="stMarkdownContainer"] h4 {
         color: var(--text-primary) !important;
         font-weight: bold;
-        line-height: 1.3;  /* ← INI yang mengatur spasi antar baris */
-        margin-bottom: 15px;  /* Spasi bawah heading */
+        line-height: 1.0;  /* ← INI yang mengatur spasi antar baris */
+        margin-bottom: 5px;  /* Spasi bawah heading */
     }
     
     /* Specific line height untuk masing-masing heading */
