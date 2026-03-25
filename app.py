@@ -24,7 +24,7 @@ st.set_page_config(
 )
 
 # ============================================================================
-# CUSTOM CSS
+# CUSTOM CSS - COMPLETE FIX (ALL 4 ISSUES)
 # ============================================================================
 st.markdown("""
 <style>
@@ -52,11 +52,11 @@ st.markdown("""
     }
 
     /* ========================================
-     * HEADER - FORCE WHITE TEXT
+     * HEADER - SELALU PUTIH (FIX GAMBAR 4)
      * ======================================== */
     .main-header {
         text-align: center;
-        padding: 20px;
+        padding: 25px 20px;
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         border-radius: 10px;
         margin-bottom: 30px;
@@ -65,57 +65,52 @@ st.markdown("""
     .main-header h1 {
         color: #ffffff !important;
         font-size: 2.5rem;
-        font-weight: bold;
+        font-weight: 700;
         margin: 0;
-        text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4);
     }
 
     .main-header p,
     .main-header strong,
-    .main-header em {
-        color: #f0f0f0 !important;
-        margin: 10px 0 0 0;
-        font-size: 1rem;
-    }
-
-    /* Override Streamlit default heading colors */
-    .main-header h1,
-    .main-header h2,
-    .main-header h3,
-    .main-header h4,
-    .main-header h5,
-    .main-header h6 {
+    .main-header em,
+    .main-header * {
         color: #ffffff !important;
+        text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
     }
 
     /* ========================================
-     * ALL HEADINGS OUTSIDE HEADER
+     * FOOTER - SELALU PUTIH (FIX GAMBAR 4)
      * ======================================== */
-    h3, h2, h1, h4, h5, h6,
-    .stMarkdown h3,
-    .stMarkdown h2,
-    .stMarkdown h1,
-    .stMarkdown h4,
-    .stMarkdown h5,
-    .stMarkdown h6,
-    div[data-testid="stMarkdownContainer"] h3,
-    div[data-testid="stMarkdownContainer"] h2,
-    div[data-testid="stMarkdownContainer"] h1 {
+    .footer {
+        text-align: center;
+        padding: 25px 20px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 10px;
+        color: #ffffff !important;
+        margin-top: 30px;
+    }
+
+    .footer *,
+    .footer h4,
+    .footer p,
+    .footer em,
+    .footer strong {
+        color: #ffffff !important;
+        text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
+    }
+
+    /* ========================================
+     * HEADINGS
+     * ======================================== */
+    h1, h2, h3, h4, h5, h6,
+    .stMarkdown h1, .stMarkdown h2, .stMarkdown h3,
+    .stMarkdown h4, .stMarkdown h5, .stMarkdown h6 {
         color: var(--text-primary) !important;
         font-weight: bold;
     }
 
     /* ========================================
-     * PARAGRAPH & TEXT
-     * ======================================== */
-    p, .stMarkdown p,
-    div[data-testid="stMarkdownContainer"] p,
-    strong, b, em, i {
-        color: var(--text-primary) !important;
-    }
-
-    /* ========================================
-     * INFO BOX - FIX FORMATTING
+     * INFO BOX
      * ======================================== */
     .info-box {
         background: var(--bg-info) !important;
@@ -126,27 +121,67 @@ st.markdown("""
         color: var(--text-primary) !important;
     }
 
+    .info-box *,
     .info-box p,
     .info-box strong,
     .info-box em,
     .info-box li,
     .info-box h4,
-    .info-box h3,
-    .info-box table,
-    .info-box td,
-    .info-box th {
+    .info-box h3 {
         color: var(--text-primary) !important;
     }
 
-    .info-box ul,
-    .info-box ol {
-        margin: 10px 0;
-        padding-left: 20px;
+    /* ========================================
+     * TABLE BORDERS (FIX GAMBAR 1)
+     * ======================================== */
+    .info-box table,
+    .info-box th,
+    .info-box td {
+        border: 1px solid var(--border-color) !important;
+        border-collapse: collapse;
+    }
+    
+    .info-box th,
+    .info-box td {
+        padding: 10px 15px;
+        text-align: left;
+    }
+    
+    .info-box th {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white !important;
+        font-weight: bold;
+    }
+    
+    .info-box tr:nth-child(even) {
+        background-color: var(--bg-secondary);
     }
 
-    .info-box li {
-        margin: 5px 0;
-        line-height: 1.6;
+    [data-theme="dark"] .info-box table,
+    [data-theme="dark"] .info-box th,
+    [data-theme="dark"] .info-box td {
+        border-color: #4a5568 !important;
+    }
+
+    /* ========================================
+     * TABLE BODY TOP-CENTER (FIX GAMBAR 2)
+     * ======================================== */
+    .stDataFrame tbody td,
+    div[data-testid="stDataFrame"] tbody td {
+        text-align: center !important;
+        vertical-align: top !important;
+        padding: 12px 15px !important;
+        color: var(--text-primary) !important;
+    }
+    
+    .stDataFrame thead th,
+    div[data-testid="stDataFrame"] thead th {
+        text-align: center !important;
+        vertical-align: middle !important;
+        padding: 15px !important;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+        color: white !important;
+        font-weight: bold;
     }
 
     /* ========================================
@@ -164,39 +199,19 @@ st.markdown("""
     }
 
     /* ========================================
-     * SUCCESS/ALERT BOX
+     * ALERT/SUCCESS BOX
      * ======================================== */
-    div[data-testid="stAlert"][role="alert"] {
+    div[data-testid="stAlert"] {
         background: var(--bg-info) !important;
         color: var(--text-primary) !important;
         border: 2px solid var(--border-color);
         border-radius: 8px;
-        padding: 10px;
     }
 
-    div[data-testid="stAlert"][role="alert"] p,
-    div[data-testid="stAlert"][role="alert"] strong {
+    div[data-testid="stAlert"] *,
+    div[data-testid="stAlert"] p,
+    div[data-testid="stAlert"] strong {
         color: var(--text-primary) !important;
-    }
-
-    /* ========================================
-     * TABLE - HEADER TOP CENTER
-     * ======================================== */
-    .stDataFrame thead th,
-    table thead th {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
-        color: #ffffff !important;
-        font-weight: bold;
-        text-align: center !important;
-        vertical-align: top !important;
-        padding: 12px;
-        border: 1px solid #ffffff30;
-    }
-
-    .stDataFrame tbody td {
-        color: var(--text-primary) !important;
-        text-align: center !important;
-        padding: 10px;
     }
 
     /* ========================================
@@ -209,22 +224,6 @@ st.markdown("""
         font-weight: bold;
         border: none;
         border-radius: 6px;
-        padding: 10px 20px;
-    }
-
-    /* ========================================
-     * SIDEBAR
-     * ======================================== */
-    section[data-testid="stSidebar"] {
-        background-color: var(--bg-secondary) !important;
-    }
-
-    section[data-testid="stSidebar"] h1,
-    section[data-testid="stSidebar"] h2,
-    section[data-testid="stSidebar"] h3,
-    section[data-testid="stSidebar"] p,
-    section[data-testid="stSidebar"] label {
-        color: var(--text-primary) !important;
     }
 
     /* ========================================
@@ -232,6 +231,10 @@ st.markdown("""
      * ======================================== */
     .stApp {
         background-color: var(--bg-primary) !important;
+        color: var(--text-primary) !important;
+    }
+
+    p, .stMarkdown p, strong, b, em, i, li {
         color: var(--text-primary) !important;
     }
 </style>
