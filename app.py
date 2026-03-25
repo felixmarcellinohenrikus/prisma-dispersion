@@ -41,6 +41,17 @@ st.markdown("""
         display: none !important;
     }
 
+    /* Force sidebar selalu terbuka */
+    section[data-testid="stSidebar"] {
+        display: block !important;
+        visibility: visible !important;
+    }
+    
+    /* Hide tombol toggle sidebar */
+    button[aria-label="Toggle sidebar"] {
+        display: none !important;
+    }
+    
     /* ========================================
      * CSS VARIABLES - LIGHT MODE ONLY
      * ======================================== */
