@@ -246,7 +246,7 @@ st.markdown("""
 st.markdown("""
 <div class="main-header">
     <h1>🔬 Simulasi Dispersi Cahaya pada Prisma</h1>
-    <p>Dikembangkan oleh <strong>Felix Marcellino Henrikus, S.Si.</strong></p>
+    <p>Dikembangkan oleh Felix Marcellino Henrikus, S.Si.</p>
     <p>Program Studi Magister Sains Data, UKSW Salatiga</p>
 </div>
 """, unsafe_allow_html=True)
@@ -496,7 +496,7 @@ st.markdown("""
 | **r₁** | Sudut bias pertama | Dalam prisma (sisi kiri) |
 | **i₂** | Sudut datang kedua | Dalam prisma (sisi kanan) |
 | **r₂** | Sudut bias kedua | Luar prisma (sisi kanan) |
-| **A** | Sudut puncak prisma | Di apex prisma |
+| **β** | Sudut puncak prisma | Di apex prisma |
 | **δ** | Sudut deviasi | Antara perpanjangan sinar datang & sinar keluar |
 
 **Alur Cahaya:**
@@ -533,19 +533,19 @@ $$n_1 \\sin(\\theta_1) = n_2 \\sin(\\theta_2)$$
 
 #### 2. Sudut Deviasi pada Prisma
 
-$$\\delta = i_1 + i_2 - A$$
+$$\\delta = i_1 + i_2 - \\beta$$
 
 **Keterangan:**
 - $\\delta$ = Sudut deviasi
 - $i_1$ = Sudut datang pada permukaan pertama
 - $i_2$ = Sudut keluar pada permukaan kedua
-- $A$ = Sudut puncak prisma
+- $β$ = Sudut puncak prisma
 
 ---
 
 #### 3. Hubungan Sudut dalam Prisma
 
-$$r_1 + r_2 = A$$
+$$r_1 + r_2 = β$$
 
 **Keterangan:**
 - $r_1$ = Sudut bias pada permukaan pertama
@@ -555,7 +555,7 @@ $$r_1 + r_2 = A$$
 
 #### 4. Persamaan Cauchy (Model Dispersi)
 
-$$n(\\lambda) = A + \\frac{B}{\\lambda^2} + \\frac{C}{\\lambda^4}$$
+$$n(\\lambda) = β + \\frac{B}{\\lambda^2} + \\frac{C}{\\lambda^4}$$
 
 **Keterangan:**
 - $A, B, C$ = Konstanta material (empiris)
@@ -1119,7 +1119,7 @@ with col_exp1:
             data=csv,
             file_name=f"prisma_data_i{incident_angle}_A{prism_angle}.csv",
             mime="text/csv",
-            use_container_width=True  # Agar button full width
+            use_container_width=True
         )
 
 with col_exp2:
@@ -1143,7 +1143,7 @@ st.markdown("---")
 footer_html = (
     "<div class='footer'>"
     "<h4>🔬 Simulasi Dispersi Cahaya pada Prisma</h4>"
-    "<p><em>Dikembangkan oleh Felix Marcellino Henrikus, S.Si.</em></p>"
+    "<p>Dikembangkan oleh Felix Marcellino Henrikus, S.Si.</p>"
     "<p>Program Studi Magister Sains Data, UKSW Salatiga</p>"
     "</div>"
 )
