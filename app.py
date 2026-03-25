@@ -848,7 +848,7 @@ st.pyplot(fig_n)
 plt.close(fig_n)
 
 st.markdown("""
-<div class="info-box" style="background: var(--bg-warning);">
+<div class="info-box">
     <h4>💡 Interpretasi Grafik:</h4>
     <ul>
         <li>Semakin <strong>besar indeks bias (n)</strong>, semakin <strong>besar sudut deviasi (δ)</strong></li>
@@ -857,16 +857,20 @@ st.markdown("""
     </ul>
     
     <h4>📐 Rumus Sudut Deviasi Minimum:</h4>
-    <p>$$\\delta_{\\text{min}} = 2 \\cdot \\arcsin\\!\\big(n \\cdot \\sin(A/2)\\big) - A$$</p>
+    <p style="text-align: center; font-size: 1.2em; padding: 10px; background: var(--bg-secondary); border-radius: 5px;">
+        $$\\delta_{\\text{min}} = 2 \\cdot \\arcsin\\!\\big(n \\cdot \\sin(A/2)\\big) - A$$
+    </p>
 </div>
 """, unsafe_allow_html=True)
 
 st.markdown("""
 <div class="info-box" style="background: var(--bg-warning);">
-    <h4> Catatan: </h4>
+    <h4>📝 Catatan:</h4>
     <ul>
-        <li> Kurva menunjukkan **dispersi normal**: n menurun saat λ meningkat
-        <li> **Dispersi tinggi** = kurva lebih curam = pemisahan warna lebih jelas
+        <li>Kurva menunjukkan <strong>dispersi normal</strong>: n menurun saat λ meningkat</li>
+        <li><strong>Dispersi tinggi</strong> = kurva lebih curam = pemisahan warna lebih jelas</li>
+        <li>Material dengan dispersi tinggi (seperti flint glass) menghasilkan spektrum lebih lebar</li>
+    </ul>
 </div>
 """, unsafe_allow_html=True)
 
