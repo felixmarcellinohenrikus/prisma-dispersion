@@ -24,12 +24,25 @@ st.set_page_config(
 )
 
 # ============================================================================
-# CUSTOM CSS - COMPLETE FIX (ALL 4 ISSUES)
+# CUSTOM CSS - LIGHT MODE ONLY (DARK MODE DISABLED)
 # ============================================================================
 st.markdown("""
 <style>
     /* ========================================
-     * CSS VARIABLES
+     * HIDE THEME SWITCHER
+     * ======================================== */
+    header {
+        visibility: hidden;
+    }
+    
+    /* Atau hide hanya tombol theme */
+    button[title="Change theme"],
+    button[kind="header"] {
+        display: none !important;
+    }
+
+    /* ========================================
+     * CSS VARIABLES - LIGHT MODE ONLY
      * ======================================== */
     :root {
         --bg-primary: #ffffff;
@@ -41,18 +54,8 @@ st.markdown("""
         --border-color: #667eea;
     }
 
-    [data-theme="dark"] {
-        --bg-primary: #0e1117;
-        --bg-secondary: #262730;
-        --bg-info: #2d3748;
-        --bg-warning: #4a3c00;
-        --text-primary: #ffffff;
-        --text-secondary: #e0e0e0;
-        --border-color: #8b9dc3;
-    }
-
     /* ========================================
-     * HEADER - SELALU PUTIH (FIX GAMBAR 4)
+     * HEADER - SELALU PUTIH
      * ======================================== */
     .main-header {
         text-align: center;
@@ -79,7 +82,7 @@ st.markdown("""
     }
 
     /* ========================================
-     * FOOTER - SELALU PUTIH (FIX GAMBAR 4)
+     * FOOTER - SELALU PUTIH
      * ======================================== */
     .footer {
         text-align: center;
@@ -102,7 +105,7 @@ st.markdown("""
     /* ========================================
      * HEADINGS
      * ======================================== */
-        h1, h2, h3, h4, h5, h6,
+    h1, h2, h3, h4, h5, h6,
     .stMarkdown h1, .stMarkdown h2, .stMarkdown h3,
     .stMarkdown h4, .stMarkdown h5, .stMarkdown h6,
     div[data-testid="stMarkdownContainer"] h1,
@@ -111,13 +114,12 @@ st.markdown("""
     div[data-testid="stMarkdownContainer"] h4 {
         color: var(--text-primary) !important;
         font-weight: bold;
-        line-height: 0.7;  /* ← INI yang mengatur spasi antar baris */
-        margin-bottom: 1px;  /* Spasi bawah heading */
+        line-height: 0.7;
+        margin-bottom: 1px;
     }
     
-    /* Specific line height untuk masing-masing heading */
     h1, .stMarkdown h1 {
-        line-height: 1.0;  /* H1 biasanya lebih rapat */
+        line-height: 1.0;
         margin-bottom: 1px;
     }
     
@@ -169,7 +171,7 @@ st.markdown("""
     }
 
     /* ========================================
-     * TABLE BORDERS (FIX GAMBAR 1)
+     * TABLE BORDERS
      * ======================================== */
     .info-box table,
     .info-box th,
@@ -194,14 +196,8 @@ st.markdown("""
         background-color: var(--bg-secondary);
     }
 
-    [data-theme="dark"] .info-box table,
-    [data-theme="dark"] .info-box th,
-    [data-theme="dark"] .info-box td {
-        border-color: #4a5568 !important;
-    }
-
     /* ========================================
-     * TABLE BODY TOP-CENTER (FIX GAMBAR 2)
+     * TABLE BODY TOP-CENTER
      * ======================================== */
     .stDataFrame tbody td,
     div[data-testid="stDataFrame"] tbody td {
@@ -264,16 +260,13 @@ st.markdown("""
     }
 
     /* ========================================
-     * SIDEBAR - DARK MODE FIX (WHITE TEXT)
+     * SIDEBAR - LIGHT MODE
      * ======================================== */
-    
-    /* Sidebar container */
     section[data-testid="stSidebar"],
     div[data-testid="stSidebar"] {
         background-color: var(--bg-secondary) !important;
     }
     
-    /* Sidebar headings */
     section[data-testid="stSidebar"] h1,
     section[data-testid="stSidebar"] h2,
     section[data-testid="stSidebar"] h3,
@@ -288,7 +281,6 @@ st.markdown("""
         font-weight: bold;
     }
     
-    /* Sidebar labels (slider labels, selectbox labels, etc.) */
     section[data-testid="stSidebar"] label,
     div[data-testid="stSidebar"] label,
     section[data-testid="stSidebar"] .stMarkdown,
@@ -300,7 +292,6 @@ st.markdown("""
         color: var(--text-primary) !important;
     }
     
-    /* Sidebar slider text */
     section[data-testid="stSidebar"] .stSlider label,
     section[data-testid="stSidebar"] .stSlider div,
     div[data-testid="stSidebar"] .stSlider label,
@@ -308,7 +299,6 @@ st.markdown("""
         color: var(--text-primary) !important;
     }
     
-    /* Sidebar selectbox/dropdown */
     section[data-testid="stSidebar"] .stSelectbox label,
     section[data-testid="stSidebar"] .stSelectbox div,
     div[data-testid="stSidebar"] .stSelectbox label,
@@ -316,7 +306,6 @@ st.markdown("""
         color: var(--text-primary) !important;
     }
     
-    /* Sidebar checkbox */
     section[data-testid="stSidebar"] .stCheckbox label,
     section[data-testid="stSidebar"] .stCheckbox div,
     div[data-testid="stSidebar"] .stCheckbox label,
@@ -324,7 +313,6 @@ st.markdown("""
         color: var(--text-primary) !important;
     }
     
-    /* Sidebar info box */
     section[data-testid="stSidebar"] .stAlert,
     div[data-testid="stSidebar"] .stAlert,
     section[data-testid="stSidebar"] div[role="alert"],
@@ -339,102 +327,68 @@ st.markdown("""
     div[data-testid="stSidebar"] .stAlert strong {
         color: var(--text-primary) !important;
     }
-    
-    /* Dark mode specific overrides */
-    [data-theme="dark"] section[data-testid="stSidebar"],
-    [data-theme="dark"] div[data-testid="stSidebar"] {
-        background-color: #262730 !important;
-    }
-    
-    [data-theme="dark"] section[data-testid="stSidebar"] *,
-    [data-theme="dark"] div[data-testid="stSidebar"] * {
-        color: #ffffff !important;
-    }
-    
-    [data-theme="dark"] section[data-testid="stSidebar"] label,
-    [data-theme="dark"] div[data-testid="stSidebar"] label {
-        color: #e0e0e0 !important;
-    }
-    
-    [data-theme="dark"] section[data-testid="stSidebar"] h1,
-    [data-theme="dark"] section[data-testid="stSidebar"] h2,
-    [data-theme="dark"] section[data-testid="stSidebar"] h3,
-    [data-theme="dark"] div[data-testid="stSidebar"] h1,
-    [data-theme="dark"] div[data-testid="stSidebar"] h2,
-    [data-theme="dark"] div[data-testid="stSidebar"] h3 {
-        color: #ffffff !important;
-    }
 
     /* ========================================
-     * SIDEBAR SELECTBOX - COMPLETE FIX
+     * SIDEBAR SELECTBOX
      * ======================================== */
+    .stSelectbox label,
+    div[data-testid="stSelectbox"] label,
+    div[data-testid="stSelectbox"] > div {
+        color: var(--text-primary) !important;
+    }
     
-    /* Fix untuk selectbox label dan container */
-    [data-theme="dark"] .stSelectbox label,
-    [data-theme="dark"] div[data-testid="stSelectbox"] label,
-    [data-theme="dark"] div[data-testid="stSelectbox"] > div {
+    div[data-baseweb="menu"],
+    ul[data-baseweb="menu"],
+    [role="listbox"] {
+        background-color: var(--bg-secondary) !important;
+        border-color: var(--border-color) !important;
+    }
+    
+    div[data-baseweb="menu"] [role="option"],
+    ul[data-baseweb="menu"] [role="option"],
+    [role="listbox"] [role="option"],
+    div[data-baseweb="menu"] li,
+    ul[data-baseweb="menu"] li,
+    [role="listbox"] li {
+        color: var(--text-primary) !important;
+        background-color: var(--bg-secondary) !important;
+    }
+    
+    div[data-baseweb="menu"] [role="option"]:hover,
+    ul[data-baseweb="menu"] [role="option"]:hover,
+    [role="listbox"] [role="option"]:hover,
+    div[data-baseweb="menu"] li:hover,
+    ul[data-baseweb="menu"] li:hover,
+    [role="listbox"] li:hover {
+        color: var(--text-primary) !important;
+        background-color: var(--bg-info) !important;
+    }
+    
+    div[data-baseweb="menu"] [role="option"][aria-selected="true"],
+    [role="listbox"] [role="option"][aria-selected="true"] {
         color: #ffffff !important;
+        background-color: var(--border-color) !important;
     }
     
-    /* Fix untuk dropdown menu container */
-    [data-theme="dark"] div[data-baseweb="menu"],
-    [data-theme="dark"] ul[data-baseweb="menu"],
-    [data-theme="dark"] [role="listbox"] {
-        background-color: #262730 !important;
-        border-color: #4a5568 !important;
+    div[data-baseweb="select"] > div,
+    div[data-baseweb="select"] input,
+    div[data-baseweb="select"] span,
+    div[data-baseweb="select"] .baseweb-select__value {
+        color: var(--text-primary) !important;
     }
     
-    /* Fix untuk OPTION TEXT dalam dropdown */
-    [data-theme="dark"] div[data-baseweb="menu"] [role="option"],
-    [data-theme="dark"] ul[data-baseweb="menu"] [role="option"],
-    [data-theme="dark"] [role="listbox"] [role="option"],
-    [data-theme="dark"] div[data-baseweb="menu"] li,
-    [data-theme="dark"] ul[data-baseweb="menu"] li,
-    [data-theme="dark"] [role="listbox"] li,
-    [data-theme="dark"] .baseweb-menu__item {
-        color: #ffffff !important;
-        background-color: #262730 !important;
+    div[data-baseweb="select"] svg,
+    div[data-baseweb="select"] path {
+        fill: var(--text-primary) !important;
     }
     
-    /* Hover state untuk options */
-    [data-theme="dark"] div[data-baseweb="menu"] [role="option"]:hover,
-    [data-theme="dark"] ul[data-baseweb="menu"] [role="option"]:hover,
-    [data-theme="dark"] [role="listbox"] [role="option"]:hover,
-    [data-theme="dark"] div[data-baseweb="menu"] li:hover,
-    [data-theme="dark"] ul[data-baseweb="menu"] li:hover,
-    [data-theme="dark"] [role="listbox"] li:hover {
-        color: #ffffff !important;
-        background-color: #4a5568 !important;
+    div[data-testid="stSelectbox"] *,
+    div[data-baseweb="select"] *,
+    div[data-baseweb="menu"] *,
+    [role="listbox"] * {
+        color: var(--text-primary) !important;
     }
-    
-    /* Selected option */
-    [data-theme="dark"] div[data-baseweb="menu"] [role="option"][aria-selected="true"],
-    [data-theme="dark"] [role="listbox"] [role="option"][aria-selected="true"] {
-        color: #ffffff !important;
-        background-color: #667eea !important;
-    }
-    
-    /* Fix untuk selectbox value yang ditampilkan */
-    [data-theme="dark"] div[data-baseweb="select"] > div,
-    [data-theme="dark"] div[data-baseweb="select"] input,
-    [data-theme="dark"] div[data-baseweb="select"] span,
-    [data-theme="dark"] div[data-baseweb="select"] .baseweb-select__value {
-        color: #ffffff !important;
-    }
-    
-    /* Fix untuk dropdown arrow icon */
-    [data-theme="dark"] div[data-baseweb="select"] svg,
-    [data-theme="dark"] div[data-baseweb="select"] path {
-        fill: #ffffff !important;
-    }
-    
-    /* Force semua text di dalam selectbox jadi putih */
-    [data-theme="dark"] div[data-testid="stSelectbox"] *,
-    [data-theme="dark"] div[data-baseweb="select"] *,
-    [data-theme="dark"] div[data-baseweb="menu"] *,
-    [data-theme="dark"] [role="listbox"] * {
-        color: #ffffff !important;
-    }
+
     /* ========================================
      * GENERAL
      * ======================================== */
