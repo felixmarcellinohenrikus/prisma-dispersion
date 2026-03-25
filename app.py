@@ -1029,9 +1029,11 @@ st.markdown("""
 
 #### 📐 Rumus Sudut Deviasi Minimum:
 
+st.latex(r"\delta_{\text{min}} = 2 \cdot \arcsin\left(n \cdot \sin\left(\frac{A}{2}\right)\right) - β")
+
 </div>
 """, unsafe_allow_html=True)
-st.latex(r"\delta_{\text{min}} = 2 \cdot \arcsin\left(n \cdot \sin\left(\frac{A}{2}\right)\right) - β")
+
 
 st.markdown("""
 <div class="info-box" style="background: var(--bg-warning);">
