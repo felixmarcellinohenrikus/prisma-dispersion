@@ -24,15 +24,14 @@ st.set_page_config(
 )
 
 # ============================================================================
-# CUSTOM CSS - THEME AWARE (LIGHT & DARK MODE) - IMPROVED
+# CUSTOM CSS - COMPLETE DARK MODE FIX
 # ============================================================================
 st.markdown("""
 <style>
     /* ========================================
-     * CSS VARIABLES - OTOMATIS SESUAI THEME
+     * CSS VARIABLES - THEME AWARE
      * ======================================== */
     :root {
-        /* Light Mode (default) */
         --bg-primary: #ffffff;
         --bg-secondary: #f8f9fa;
         --bg-info: #e8f4f8;
@@ -43,10 +42,14 @@ st.markdown("""
         --border-color: #667eea;
         --table-header-bg: #667eea;
         --table-header-text: #ffffff;
-        --shadow-color: rgba(0, 0, 0, 0.1);
+        --button-bg: #667eea;
+        --button-text: #ffffff;
+        --metric-bg: #f0f2f6;
+        --metric-text: #0e1117;
+        --success-bg: #d4edda;
+        --success-text: #155724;
     }
 
-    /* Dark Mode */
     [data-theme="dark"] {
         --bg-primary: #0e1117;
         --bg-secondary: #262730;
@@ -58,11 +61,34 @@ st.markdown("""
         --border-color: #8b9dc3;
         --table-header-bg: #4a5568;
         --table-header-text: #ffffff;
-        --shadow-color: rgba(255, 255, 255, 0.1);
+        --button-bg: #4a6ee0;
+        --button-text: #ffffff;
+        --metric-bg: #262730;
+        --metric-text: #ffffff;
+        --success-bg: #1e4620;
+        --success-text: #7ee787;
     }
 
     /* ========================================
-     * HEADER - THEME AWARE
+     * ALL HEADINGS - VISIBLE IN DARK MODE
+     * ======================================== */
+    h1, h2, h3, h4, h5, h6,
+    .stMarkdown h1,
+    .stMarkdown h2,
+    .stMarkdown h3,
+    .stMarkdown h4,
+    .stMarkdown h5,
+    .stMarkdown h6,
+    h3[data-testid="stHeading"],
+    div[data-testid="stMarkdownContainer"] h3,
+    div[data-testid="stMarkdownContainer"] h2,
+    div[data-testid="stMarkdownContainer"] h1 {
+        color: var(--text-primary) !important;
+        font-weight: bold;
+    }
+
+    /* ========================================
+     * HEADER SECTION - ALWAYS WHITE
      * ======================================== */
     .main-header {
         text-align: center;
@@ -75,47 +101,80 @@ st.markdown("""
 
     .main-header h1,
     .main-header h2,
-    .main-header h3,
-    .main-header h4,
-    .main-header h5,
-    .main-header h6 {
-        color: white !important;
-        margin: 0;
-    }
-
     .main-header p,
-    .main-header em,
-    .main-header strong {
-        color: #f0f0f0 !important;
-        margin: 10px 0 0 0;
+    .main-header strong,
+    .main-header em {
+        color: white !important;
     }
 
     /* ========================================
-     * ALL HEADINGS - THEME AWARE
+     * PARAGRAPH TEXT - THEME AWARE
      * ======================================== */
-    h1, h2, h3, h4, h5, h6,
-    .stMarkdown h1,
-    .stMarkdown h2,
-    .stMarkdown h3,
-    .stMarkdown h4,
-    .stMarkdown h5,
-    .stMarkdown h6,
-    .stMarkdown p strong,
-    .stMetricLabel,
-    .stMetricValue {
+    p, .stMarkdown p,
+    div[data-testid="stMarkdownContainer"] p {
         color: var(--text-primary) !important;
+    }
+
+    strong, b {
+        color: var(--text-primary) !important;
+    }
+
+    /* ========================================
+     * METRIC CARDS - VISIBLE IN DARK MODE
+     * ======================================== */
+    div[data-testid="stMetric"],
+    .stMetric {
+        background: var(--metric-bg) !important;
+        padding: 15px !important;
+        border-radius: 8px;
+    }
+
+    div[data-testid="stMetricLabel"],
+    .stMetricLabel,
+    div[data-testid="stMetric"] label,
+    .stMetric label {
+        color: var(--metric-text) !important;
+        font-weight: bold;
+    }
+
+    div[data-testid="stMetricValue"],
+    .stMetricValue,
+    div[data-testid="stMetric"] .value,
+    .stMetric .value {
+        color: var(--metric-text) !important;
+        font-size: 2rem;
+        font-weight: bold;
+    }
+
+    /* ========================================
+     * SUCCESS/ALERT BOX - VISIBLE IN DARK MODE
+     * ======================================== */
+    div[data-testid="stAlert"][role="alert"],
+    .stAlert,
+    div[data-testid="stAlert"] {
+        background: var(--success-bg) !important;
+        color: var(--success-text) !important;
+        border: 1px solid var(--success-text);
+        border-radius: 8px;
+        padding: 10px;
+    }
+
+    div[data-testid="stAlert"] p,
+    div[data-testid="stAlert"] strong,
+    div[data-testid="stAlert"] span {
+        color: var(--success-text) !important;
     }
 
     /* ========================================
      * INFO BOX - THEME AWARE
      * ======================================== */
     .info-box {
-        background: var(--bg-info);
+        background: var(--bg-info) !important;
         padding: 15px;
         border-radius: 8px;
         border-left: 5px solid var(--border-color);
         margin: 10px 0;
-        color: var(--text-primary);
+        color: var(--text-primary) !important;
     }
 
     .info-box h4,
@@ -124,30 +183,41 @@ st.markdown("""
     .info-box strong,
     .info-box td,
     .info-box th,
-    .info-box li {
+    .info-box li,
+    .info-box em {
         color: var(--text-primary) !important;
     }
 
     /* ========================================
-     * TABLE - THEME AWARE (PERBAIKAN HEADER)
+     * TABLE - HEADER TOP CENTER & VISIBLE
      * ======================================== */
     .stDataFrame thead th,
     table thead th,
-    .stTable table thead th {
-        background-color: var(--table-header-bg) !important;
-        color: var(--table-header-text) !important;
+    .stTable table thead th,
+    div[data-testid="stDataFrame"] thead th {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+        color: white !important;
         font-weight: bold;
-        border: 1px solid var(--border-color);
+        text-align: center !important;
+        vertical-align: top !important;
+        border: 1px solid #ffffff30;
+        padding: 12px;
+        text-transform: uppercase;
+        font-size: 13px;
+        letter-spacing: 0.5px;
     }
 
     .stDataFrame tbody td,
     table tbody td,
-    .stTable table tbody td {
+    .stTable table tbody td,
+    div[data-testid="stDataFrame"] tbody td {
         color: var(--text-primary) !important;
         background-color: var(--bg-primary);
+        padding: 10px;
+        text-align: center !important;
     }
 
-    /* Alternating row colors untuk readability */
+    /* Alternating rows */
     .stDataFrame tbody tr:nth-child(odd) td {
         background-color: var(--bg-secondary);
     }
@@ -157,7 +227,7 @@ st.markdown("""
     }
 
     /* ========================================
-     * FOOTER - THEME AWARE
+     * FOOTER - ALWAYS WHITE
      * ======================================== */
     .footer {
         text-align: center;
@@ -176,35 +246,65 @@ st.markdown("""
     }
 
     /* ========================================
-     * GENERAL TEXT - THEME AWARE
+     * BUTTONS - VISIBLE IN DARK MODE
      * ======================================== */
-    body,
+    .stButton>button,
+    button[data-testid="stButton"],
+    div[data-testid="stButton"] button {
+        background-color: var(--button-bg) !important;
+        color: var(--button-text) !important;
+        border: 2px solid var(--border-color) !important;
+        font-weight: bold;
+        padding: 10px 20px;
+        border-radius: 6px;
+        cursor: pointer;
+    }
+
+    .stButton>button:hover,
+    button[data-testid="stButton"]:hover {
+        background-color: var(--border-color) !important;
+        color: white !important;
+    }
+
+    /* Download button specific */
+    div[data-testid="stDownloadButton"] button,
+    .stDownloadButton>button {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+        color: white !important;
+        font-weight: bold;
+        border: none;
+    }
+
+    /* ========================================
+     * SIDEBAR - THEME AWARE
+     * ======================================== */
+    section[data-testid="stSidebar"],
+    div[data-testid="stSidebar"] {
+        background-color: var(--bg-secondary) !important;
+        color: var(--text-primary) !important;
+    }
+
+    section[data-testid="stSidebar"] h1,
+    section[data-testid="stSidebar"] h2,
+    section[data-testid="stSidebar"] h3,
+    section[data-testid="stSidebar"] p,
+    section[data-testid="stSidebar"] strong,
+    section[data-testid="stSidebar"] label {
+        color: var(--text-primary) !important;
+    }
+
+    /* ========================================
+     * GENERAL CONTAINERS
+     * ======================================== */
     .stApp,
-    .stMarkdown,
-    .stMarkdown p,
-    .stMarkdown strong,
-    .stMarkdown em,
-    .stMarkdown li,
-    div[data-testid="stMarkdownContainer"] {
+    body,
+    div[data-testid="stAppViewContainer"] {
+        background-color: var(--bg-primary) !important;
         color: var(--text-primary) !important;
     }
 
     /* ========================================
-     * METRIC CARDS - THEME AWARE
-     * ======================================== */
-    .stMetric {
-        background: var(--bg-secondary);
-        padding: 10px;
-        border-radius: 8px;
-    }
-
-    .stMetricLabel,
-    .stMetricValue {
-        color: var(--text-primary) !important;
-    }
-
-    /* ========================================
-     * CODE BLOCKS - THEME AWARE
+     * CODE BLOCKS
      * ======================================== */
     pre, code {
         background: var(--bg-secondary);
@@ -212,35 +312,31 @@ st.markdown("""
     }
 
     /* ========================================
-     * SIDEBAR - THEME AWARE
+     * LINKS
      * ======================================== */
-    section[data-testid="stSidebar"] {
-        background-color: var(--bg-secondary);
-        color: var(--text-primary);
+    a {
+        color: var(--border-color) !important;
     }
 
-    section[data-testid="stSidebar"] h1,
-    section[data-testid="stSidebar"] h2,
-    section[data-testid="stSidebar"] h3,
-    section[data-testid="stSidebar"] p,
-    section[data-testid="stSidebar"] strong {
+    /* ========================================
+     * EXPANDER/COLLAPSIBLE
+     * ======================================== */
+    details summary {
         color: var(--text-primary) !important;
     }
 
     /* ========================================
-     * BUTTONS - THEME AWARE
+     * INFO BOX (st.info)
      * ======================================== */
-    .stButton>button {
-        color: var(--text-primary);
-        background-color: var(--bg-primary);
-        border: 1px solid var(--border-color);
+    div[data-testid="stAlert"][role="alert"] {
+        background: var(--bg-info) !important;
+        color: var(--text-primary) !important;
+        border-left: 5px solid var(--border-color);
     }
 
-    /* ========================================
-     * LINKS - THEME AWARE
-     * ======================================== */
-    a {
-        color: var(--border-color) !important;
+    div[data-testid="stAlert"][role="alert"] p,
+    div[data-testid="stAlert"][role="alert"] strong {
+        color: var(--text-primary) !important;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -442,14 +538,26 @@ if results:
     col1, col2, col3 = st.columns(3)
     
     with col1:
-        st.metric("🔴 Sudut Deviasi (Merah)", f"{results[0]['delta']:.2f}°")
+        st.metric(
+            label="🔴 Sudut Deviasi (Merah)",
+            value=f"{results[0]['delta']:.2f}°",
+            help="Sudut deviasi untuk cahaya merah (700 nm)"
+        )
     
     with col2:
         mid_idx = len(results) // 2
-        st.metric("🟢 Sudut Deviasi (Hijau)", f"{results[mid_idx]['delta']:.2f}°")
+        st.metric(
+            label="🟢 Sudut Deviasi (Hijau)",
+            value=f"{results[mid_idx]['delta']:.2f}°",
+            help="Sudut deviasi untuk cahaya hijau (550 nm)"
+        )
     
     with col3:
-        st.metric("🟣 Sudut Deviasi (Ungu)", f"{results[-1]['delta']:.2f}°")
+        st.metric(
+            label="🟣 Sudut Deviasi (Ungu)",
+            value=f"{results[-1]['delta']:.2f}°",
+            help="Sudut deviasi untuk cahaya ungu (380 nm)"
+        )
     
     delta_range = results[-1]['delta'] - results[0]['delta']
     st.success(f"**🌈 Sudut Dispersi (Δδ):** {delta_range:.2f}°")
@@ -719,7 +827,11 @@ plt.tight_layout()
 st.pyplot(fig_dyn)
 plt.close(fig_dyn)
 
-st.info(f"**Indeks bias pada λ = 550 nm:** Cauchy = {n_cauchy_550:.4f}, Sellmeier = {n_sellmeier_550:.4f}")
+st.info(f"""
+**Indeks bias pada λ = 550 nm:** 
+- Cauchy = {n_cauchy_550:.4f}
+- Sellmeier = {n_sellmeier_550:.4f}
+""")
 
 st.markdown("""
 <div class="info-box">
@@ -845,17 +957,22 @@ plt.close(fig_n)
 
 st.markdown("""
 <div class="info-box">
-
 **💡 Interpretasi Grafik:**
-
 - Semakin **besar indeks bias (n)**, semakin **besar sudut deviasi (δ)**
 - Cahaya dengan **panjang gelombang lebih pendek** (biru) memiliki indeks bias lebih besar → deviasi lebih besar
 - **Dispersi** = perbedaan deviasi antar warna → spektrum terpisah
 
 **📐 Rumus Sudut Deviasi Minimum:**
-
 $$\\delta_{\\text{min}} = 2 \\cdot \\arcsin\\!\\big(n \\cdot \\sin(A/2)\\big) - A$$
+</div>
+""", unsafe_allow_html=True)
 
+# Untuk warning box
+st.markdown("""
+<div class="info-box" style="background: var(--bg-warning);">
+**📝 Catatan:**
+- Kurva menunjukkan **dispersi normal**: n menurun saat λ meningkat
+- **Dispersi tinggi** = kurva lebih curam = pemisahan warna lebih jelas
 </div>
 """, unsafe_allow_html=True)
 
@@ -1090,7 +1207,7 @@ st.markdown(f"""
 st.markdown("---")
 st.markdown("### 💾 Export Data")
 
-col_exp1, col_exp2, col_exp3 = st.columns(3)
+col_exp1, col_exp2 = st.columns(2)
 
 with col_exp1:
     if results:
@@ -1101,28 +1218,21 @@ with col_exp1:
             data=csv,
             file_name=f"prisma_data_i{incident_angle}_A{prism_angle}.csv",
             mime="text/csv",
+            use_container_width=True  # Agar button full width
         )
 
 with col_exp2:
-    if 'fig_ray' in locals():
+    if 'fig_disp' in locals():
         buf = io.BytesIO()
-        fig_ray.savefig(buf, format='png', dpi=150, bbox_inches='tight')
+        fig_disp.savefig(buf, format='png', dpi=150, bbox_inches='tight')
         buf.seek(0)
         st.download_button(
-            label="📥 Download Diagram (PNG)",
+            label="📥 Download Grafik (PNG)",
             data=buf,
-            file_name=f"prisma_diagram_i{incident_angle}_A{prism_angle}.png",
+            file_name=f"prisma_dispersi_{material_preset.replace(' ', '_')}.png",
             mime="image/png",
+            use_container_width=True
         )
-
-with col_exp3:
-    st.download_button(
-        label="📥 Download Semua Grafik (ZIP)",
-        data=b"Coming soon...",
-        file_name="all_plots.zip",
-        mime="application/zip",
-        disabled=True
-    )
     
 # ============================================================================
 # FOOTER
