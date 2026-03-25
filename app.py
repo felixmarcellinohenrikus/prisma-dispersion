@@ -1029,20 +1029,18 @@ st.markdown("""
 
 #### 📐 Rumus Sudut Deviasi Minimum:
 
-$\\delta_{\\text{min}} = 2 \\cdot \\arcsin\\left(n \\cdot \\sin\\left(\\frac{A}{2}\\right)\\right) - β$
+<div style="text-align: center;">
+
+$$\\delta_{\\text{min}} = 2 \\cdot \\arcsin\\left(n \\cdot \\sin\\left(\\frac{A}{2}\\right)\\right) - β$$
 
 </div>
-""", unsafe_allow_html=True)
 
+#### 📝 Catatan:
 
-st.markdown("""
-<div class="info-box" style="background: var(--bg-warning);">
-    <h4>📝 Catatan:</h4>
-    <ul>
-        <li>Kurva menunjukkan <strong>dispersi normal</strong>: n menurun saat λ meningkat</li>
-        <li><strong>Dispersi tinggi</strong> = kurva lebih curam = pemisahan warna lebih jelas</li>
-        <li>Material dengan dispersi tinggi (seperti flint glass) menghasilkan spektrum lebih lebar</li>
-    </ul>
+- Kurva menunjukkan <strong>dispersi normal</strong>: n menurun saat λ meningkat</li>
+- <strong>Dispersi tinggi</strong> = kurva lebih curam = pemisahan warna lebih jelas</li>
+- Material dengan dispersi tinggi (seperti flint glass) menghasilkan spektrum lebih lebar</li>
+
 </div>
 """, unsafe_allow_html=True)
 
