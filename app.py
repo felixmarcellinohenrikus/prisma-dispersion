@@ -122,27 +122,27 @@ st.markdown("""
     }
     
     h2, .stMarkdown h2 {
-        line-height: 1.0;
+        line-height: 0.5;
         margin-bottom: 1px;
     }
     
     h3, .stMarkdown h3 {
-        line-height: 1.0;
+        line-height: 0.5;
         margin-bottom: 1px;
     }
     
     h4, .stMarkdown h4 {
-        line-height: 1.0;
+        line-height: 0.5;
         margin-bottom: 1px;
     }
     
     h5, .stMarkdown h5 {
-        line-height: 1.0;
+        line-height: 0.5;
         margin-bottom: 1px;
     }
     
     h6, .stMarkdown h6 {
-        line-height: 1.0;
+        line-height: 0.5;
         margin-bottom: 1px;
     }
 
