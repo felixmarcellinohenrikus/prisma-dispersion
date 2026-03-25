@@ -705,7 +705,7 @@ plt.close(fig_disp)
 st.markdown("""
 <div style='background: #fff3cd; padding: 15px; border-radius: 8px; margin-top: 10px;'>
 
-**📝 Catatan:**
+<strong>Catatan:</strong>
 - Kurva menunjukkan **dispersi normal**: n menurun saat λ meningkat
 - **Dispersi tinggi** = kurva lebih curam = pemisahan warna lebih jelas
 - Material dengan dispersi tinggi (seperti flint glass) menghasilkan spektrum lebih lebar
