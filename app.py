@@ -850,21 +850,21 @@ plt.tight_layout()
 st.pyplot(fig_n)
 plt.close(fig_n)
 
+st.markdown('<div class="info-box">', unsafe_allow_html=True)
+
+st.markdown("#### 💡 Interpretasi Grafik:")
 st.markdown("""
-<div class="info-box">
-    <h4>💡 Interpretasi Grafik:</h4>
-    <ul>
-        <li>Semakin <strong>besar indeks bias (n)</strong>, semakin <strong>besar sudut deviasi (δ)</strong></li>
-        <li>Cahaya dengan <strong>panjang gelombang lebih pendek</strong> (biru) memiliki indeks bias lebih besar → deviasi lebih besar</li>
-        <li><strong>Dispersi</strong> = perbedaan deviasi antar warna → spektrum terpisah</li>
-    </ul>
-    
-    <h4>📐 Rumus Sudut Deviasi Minimum:</h4>
-    <p style="text-align: center; font-size: 1.2em; padding: 10px; background: var(--bg-secondary); border-radius: 5px;">
-        $$\\delta_{\\text{min}} = 2 \\cdot \\arcsin\\!\\big(n \\cdot \\sin(A/2)\\big) - A$$
-    </p>
-</div>
-""", unsafe_allow_html=True)
+- Semakin **besar indeks bias (n)**, semakin **besar sudut deviasi (δ)**
+- Cahaya dengan **panjang gelombang lebih pendek** (biru) memiliki indeks bias lebih besar → deviasi lebih besar
+- **Dispersi** = perbedaan deviasi antar warna → spektrum terpisah
+""")
+
+st.markdown("#### 📐 Rumus Sudut Deviasi Minimum:")
+
+# Gunakan st.latex() untuk persamaan LaTeX
+st.latex(r"\delta_{\text{min}} = 2 \cdot \arcsin\left(n \cdot \sin\left(\frac{A}{2}\right)\right) - A")
+
+st.markdown('</div>', unsafe_allow_html=True)
 
 st.markdown("""
 <div class="info-box" style="background: var(--bg-warning);">
@@ -1141,12 +1141,10 @@ with col_exp2:
 st.markdown("---")
 
 footer_html = (
-    "<div style='text-align: center; padding: 20px; "
-    "background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); "
-    "border-radius: 10px; color: white; margin-top: 30px;'>"
-    "<h4 style='margin: 0;'>🔬 Simulasi Dispersi Cahaya pada Prisma</h4>"
-    "<p style='margin: 10px 0 0 0;'><em>Dikembangkan oleh Felix Marcellino Henrikus, S.Si.</em></p>"
-    "<p style='margin: 5px 0 0 0; font-size: 14px;'>Program Studi Magister Sains Data, UKSW Salatiga</p>"
+    "<div class='footer'>"
+    "<h4>🔬 Simulasi Dispersi Cahaya pada Prisma</h4>"
+    "<p><em>Dikembangkan oleh Felix Marcellino Henrikus, S.Si.</em></p>"
+    "<p>Program Studi Magister Sains Data, UKSW Salatiga</p>"
     "</div>"
 )
 
