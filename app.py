@@ -329,57 +329,75 @@ st.markdown("""
     }
 
     /* ========================================
-     * SIDEBAR SELECTBOX - DARK MODE FIX
+     * SIDEBAR SELECTBOX - COMPLETE FIX
      * ======================================== */
     
-    /* Selectbox dropdown options - dark mode */
+    /* Fix untuk selectbox label dan container */
+    [data-theme="dark"] .stSelectbox label,
+    [data-theme="dark"] div[data-testid="stSelectbox"] label,
+    [data-theme="dark"] div[data-testid="stSelectbox"] > div {
+        color: #ffffff !important;
+    }
+    
+    /* Fix untuk dropdown menu container */
+    [data-theme="dark"] div[data-baseweb="menu"],
+    [data-theme="dark"] ul[data-baseweb="menu"],
+    [data-theme="dark"] [role="listbox"] {
+        background-color: #262730 !important;
+        border-color: #4a5568 !important;
+    }
+    
+    /* Fix untuk OPTION TEXT dalam dropdown */
+    [data-theme="dark"] div[data-baseweb="menu"] [role="option"],
+    [data-theme="dark"] ul[data-baseweb="menu"] [role="option"],
+    [data-theme="dark"] [role="listbox"] [role="option"],
+    [data-theme="dark"] div[data-baseweb="menu"] li,
+    [data-theme="dark"] ul[data-baseweb="menu"] li,
+    [data-theme="dark"] [role="listbox"] li,
+    [data-theme="dark"] .baseweb-menu__item {
+        color: #ffffff !important;
+        background-color: #262730 !important;
+    }
+    
+    /* Hover state untuk options */
+    [data-theme="dark"] div[data-baseweb="menu"] [role="option"]:hover,
+    [data-theme="dark"] ul[data-baseweb="menu"] [role="option"]:hover,
+    [data-theme="dark"] [role="listbox"] [role="option"]:hover,
+    [data-theme="dark"] div[data-baseweb="menu"] li:hover,
+    [data-theme="dark"] ul[data-baseweb="menu"] li:hover,
+    [data-theme="dark"] [role="listbox"] li:hover {
+        color: #ffffff !important;
+        background-color: #4a5568 !important;
+    }
+    
+    /* Selected option */
+    [data-theme="dark"] div[data-baseweb="menu"] [role="option"][aria-selected="true"],
+    [data-theme="dark"] [role="listbox"] [role="option"][aria-selected="true"] {
+        color: #ffffff !important;
+        background-color: #667eea !important;
+    }
+    
+    /* Fix untuk selectbox value yang ditampilkan */
     [data-theme="dark"] div[data-baseweb="select"] > div,
     [data-theme="dark"] div[data-baseweb="select"] input,
     [data-theme="dark"] div[data-baseweb="select"] span,
-    [data-theme="dark"] div[data-baseweb="menu"] div[role="option"],
-    [data-theme="dark"] ul[data-baseweb="menu"] li[role="option"] {
-        color: #ffffff !important;
-        background-color: #262730 !important;
-    }
-    
-    /* Selectbox dropdown options - hover state */
-    [data-theme="dark"] div[data-baseweb="menu"] div[role="option"]:hover,
-    [data-theme="dark"] ul[data-baseweb="menu"] li[role="option"]:hover {
-        color: #ffffff !important;
-        background-color: #4a5568 !important;
-    }
-    
-    /* Selectbox label dan value */
-    [data-theme="dark"] .stSelectbox label,
-    [data-theme="dark"] .stSelectbox .stMarkdown,
-    [data-theme="dark"] div[data-testid="stSelectbox"] label,
-    [data-theme="dark"] div[data-testid="stSelectbox"] .stMarkdown {
+    [data-theme="dark"] div[data-baseweb="select"] .baseweb-select__value {
         color: #ffffff !important;
     }
     
-    /* Selectbox dropdown button/arrow */
-    [data-theme="dark"] div[data-baseweb="select"] svg {
+    /* Fix untuk dropdown arrow icon */
+    [data-theme="dark"] div[data-baseweb="select"] svg,
+    [data-theme="dark"] div[data-baseweb="select"] path {
         fill: #ffffff !important;
     }
     
-    /* BaseWeb select component */
-    [data-theme="dark"] .baseweb-select,
-    [data-theme="dark"] [data-baseweb="select"] {
+    /* Force semua text di dalam selectbox jadi putih */
+    [data-theme="dark"] div[data-testid="stSelectbox"] *,
+    [data-theme="dark"] div[data-baseweb="select"] *,
+    [data-theme="dark"] div[data-baseweb="menu"] *,
+    [data-theme="dark"] [role="listbox"] * {
         color: #ffffff !important;
     }
-    
-    /* Menu items dalam dropdown */
-    [data-theme="dark"] [role="listbox"] [role="option"],
-    [data-theme="dark"] ul[role="listbox"] li {
-        color: #ffffff !important;
-        background-color: #262730 !important;
-    }
-    
-    [data-theme="dark"] [role="listbox"] [role="option"]:hover,
-    [data-theme="dark"] ul[role="listbox"] li:hover {
-        background-color: #4a5568 !important;
-    }
-    
     /* ========================================
      * GENERAL
      * ======================================== */
