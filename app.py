@@ -270,22 +270,23 @@ else:
 st.markdown("---")
 st.markdown("### 🔍 Ilustrasi Ray Tracing pada Prisma")
 
-# Download dan encode gambar
-try:
-    response = requests.get("https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/Prism_rainbow.svg/800px-Prism_rainbow.svg.png")
-    img_base64 = base64.b64encode(response.content).decode()
-    img_html = f'<img src="data:image/png;base64,{img_base64}" alt="Prisma" style="width:100%; max-width:600px;">'
-except:
-    img_html = "<p>⚠️ Gambar tidak tersedia</p>"
+# Path gambar di repository
+image_path = "images/prisma_diagram.png"
 
-st.markdown(f"""
-<div style='background: white; padding: 20px; border-radius: 10px;'>
-**Diagram Skematik Dispersi Cahaya pada Prisma:**
-{img_html}
-</div>
-""", unsafe_allow_html=True)
+# Cek apakah file ada
+import os
+if os.path.exists(image_path):
+    st.image(
+        image_path,
+        caption="Diagram Skematik Dispersi Cahaya pada Prisma",
+        use_column_width=True,
+        clamp=True
+    )
+else:
+    st.warning(f"⚠️ File gambar tidak ditemukan di {image_path}")
+    st.info("💡 Pastikan file sudah diupload ke folder images/ di repository GitHub")
 
-# Keterangan
+# Keterangan simbol
 st.markdown("""
 <div style='background: white; padding: 20px; border-radius: 10px; border: 2px solid #667eea;'>
 
@@ -306,7 +307,7 @@ st.markdown("""
 2. 🔄 **Dibiaskan pertama kali** (i₁ → r₁) - sinar membelok ke arah normal
 3. 🌈 **Terjadi dispersi** - setiap warna punya indeks bias berbeda
 4. 🔄 **Dibiaskan kedua kali** (i₂ → r₂) saat keluar prisma - sinar membelok menjauhi normal
-5. 🎨 **Spektrum warna terpisah** di luar prisma (merah, jingga, kuning, hijau, biru, nila, ungu)
+5. 🎨 **Spektrum warna terpisah** di luar prisma
 
 </div>
 """, unsafe_allow_html=True)
