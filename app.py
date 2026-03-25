@@ -602,7 +602,7 @@ if results:
     .custom-table thead tr {
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         color: white;
-        text-align: left;
+        text-align: center;
         font-weight: bold;
     }
     
