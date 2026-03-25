@@ -270,23 +270,21 @@ else:
 st.markdown("---")
 st.markdown("### 🔍 Ilustrasi Ray Tracing pada Prisma")
 
-# Encode gambar ke base64
-with open('prisma_diagram.png', 'rb') as img_file:
-    img_base64 = base64.b64encode(img_file.read()).decode()
+GITHUB_USERNAME = "felixmarcellinohenrikus"  # ← Ganti dengan username GitHub Anda
+REPO_NAME = "prisma-dispersion"      # ← Ganti dengan nama repo Anda
+BRANCH = "main"
 
-# Tampilkan dengan HTML
-st.markdown(f"""
-<div style='background: white; padding: 20px; border-radius: 10px; border: 2px solid #667eea;'>
+raw_image_url = f"https://raw.githubusercontent.com/{GITHUB_USERNAME}/{REPO_NAME}/{BRANCH}/images/prisma_diagram.png"
 
-**Diagram Skematik Dispersi Cahaya pada Prisma:**
-
-<div style="text-align: center; margin: 20px 0;">
-    <img src="data:image/png;base64,{img_base64}" 
-         alt="Prisma Dispersi" 
-         style="width: 100%; max-width: 600px; border-radius: 8px;">
-</div>
-</div>
-""", unsafe_allow_html=True)
+try:
+    st.image(
+        raw_image_url,
+        caption="Diagram Skematik Dispersi Cahaya pada Prisma",
+        use_column_width=True
+    )
+except Exception as e:
+    st.error(f"⚠️ Gambar tidak bisa dimuat: {e}")
+    st.info("💡 Pastikan file sudah diupload ke GitHub dan path benar")
 
 # Keterangan simbol
 st.markdown("""
