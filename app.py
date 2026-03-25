@@ -718,13 +718,14 @@ st.markdown("""
 # ============================================================================
 st.markdown("---")
 
-footer_content = """
-<div style='text-align: center; padding: 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
-            border-radius: 10px; color: white; margin-top: 30px;'>
-    <h4 style='margin: 0;'>🔬 Simulasi Dispersi Cahaya pada Prisma</h4>
-    <p style='margin: 10px 0 0 0;'><em>Dikembangkan oleh Felix Marcellino Henrikus, S.Si.</em></p>
-    <p style='margin: 5px 0 0 0; font-size: 14px;'>Untuk pembelajaran Optika Geometri di Fisika UKSW Salatiga</p>
-</div>
-"""
+footer_content = (
+    "<div style='text-align: center; padding: 20px; "
+    "background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); "
+    "border-radius: 10px; color: white; margin-top: 30px;'>"
+    "<h4 style='margin: 0;'>Simulasi Dispersi Cahaya pada Prisma</h4>"
+    "<p style='margin: 10px 0 0 0;'><em>Dikembangkan oleh Felix Marcellino Henrikus, S.Si.</em></p>"
+    "<p style='margin: 5px 0 0 0; font-size: 14px;'>Untuk pembelajaran Optika Geometri di Fisika UKSW Salatiga</p>"
+    "</div>"
+)
 
 st.markdown(footer_content, unsafe_allow_html=True)
