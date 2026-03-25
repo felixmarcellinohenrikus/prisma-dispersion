@@ -23,31 +23,134 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Custom CSS
+# ============================================================================
+# CUSTOM CSS - THEME AWARE (LIGHT & DARK MODE)
+# ============================================================================
 st.markdown("""
 <style>
+    /* ========================================
+     * CSS VARIABLES - OTOMATIS SESUAI THEME
+     * ======================================== */
+    :root {
+        /* Default (Light Mode) */
+        --bg-primary: #ffffff;
+        --bg-secondary: #f8f9fa;
+        --bg-info: #e8f4f8;
+        --bg-warning: #fff3cd;
+        --text-primary: #000000;
+        --text-secondary: #333333;
+        --text-muted: #666666;
+        --border-color: #667eea;
+        --shadow-color: rgba(0, 0, 0, 0.1);
+    }
+
+    /* Dark Mode - Streamlit menggunakan data-theme="dark" */
+    [data-theme="dark"] {
+        --bg-primary: #1e1e1e;
+        --bg-secondary: #262730;
+        --bg-info: #2d3748;
+        --bg-warning: #4a3c00;
+        --text-primary: #ffffff;
+        --text-secondary: #e0e0e0;
+        --text-muted: #a0a0a0;
+        --border-color: #8b9dc3;
+        --shadow-color: rgba(255, 255, 255, 0.1);
+    }
+
+    /* ========================================
+     * HEADER - THEME AWARE
+     * ======================================== */
     .main-header {
         text-align: center;
         padding: 20px;
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         border-radius: 10px;
         margin-bottom: 30px;
-        color: white;
+        color: white !important;  /* Header tetap putih (kontras dengan gradient) */
     }
+
+    .main-header h1 {
+        color: white !important;
+        margin: 0;
+    }
+
+    .main-header p {
+        color: #f0f0f0 !important;
+        margin: 10px 0 0 0;
+    }
+
+    /* ========================================
+     * INFO BOX - THEME AWARE
+     * ======================================== */
     .info-box {
-        background: #e8f4f8;
+        background: var(--bg-info);
         padding: 15px;
         border-radius: 8px;
-        border-left: 5px solid #667eea;
+        border-left: 5px solid var(--border-color);
         margin: 10px 0;
+        color: var(--text-primary);
     }
+
+    .info-box h4,
+    .info-box h3,
+    .info-box p,
+    .info-box strong,
+    .info-box td,
+    .info-box th {
+        color: var(--text-primary) !important;
+    }
+
+    /* ========================================
+     * FOOTER - THEME AWARE
+     * ======================================== */
     .footer {
         text-align: center;
         padding: 20px;
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         border-radius: 10px;
-        color: white;
+        color: white !important;
         margin-top: 30px;
+    }
+
+    .footer h4,
+    .footer p,
+    .footer em {
+        color: white !important;
+    }
+
+    /* ========================================
+     * GENERAL TEXT - THEME AWARE
+     * ======================================== */
+    .stMarkdown,
+    .stMarkdown p,
+    .stMarkdown strong,
+    .stMarkdown em {
+        color: var(--text-primary);
+    }
+
+    /* ========================================
+     * TABLE - THEME AWARE
+     * ======================================== */
+    .stDataFrame,
+    .stTable {
+        color: var(--text-primary);
+    }
+
+    /* ========================================
+     * METRIC CARDS - THEME AWARE
+     * ======================================== */
+    .stMetric {
+        background: var(--bg-secondary);
+        padding: 10px;
+        border-radius: 8px;
+    }
+
+    /* ========================================
+     * CODE BLOCKS - THEME AWARE
+     * ======================================== */
+    pre, code {
+        background: var(--bg-secondary);
+        color: var(--text-secondary);
     }
 </style>
 """, unsafe_allow_html=True)
@@ -290,7 +393,7 @@ with col2:
         st.info("💡 Pastikan file sudah diupload ke GitHub (sama folder dengan app.py)")
 
 st.markdown("""
-<div style='background: white; padding: 20px; border-radius: 10px; border: 2px solid #667eea;'>
+<div class="info-box">
 
 **Keterangan Simbol:**
 
@@ -593,7 +696,7 @@ st.pyplot(fig_n)
 plt.close(fig_n)
 
 st.markdown("""
-<div style='background: #e8f4f8; padding: 15px; border-radius: 8px; margin-top: 10px;'>
+<div class="info-box">
 
 **💡 Interpretasi Grafik:**
 
@@ -813,7 +916,7 @@ n_700 = func_active(700, params_active)
 dispersion_power = n_400 - n_700 
 
 st.markdown(f"""
-<div style='background: #fff3cd; padding: 15px; border-radius: 8px; margin-top: 10px;'>
+<div class="info-box" style="background: var(--bg-warning);">
 
 **📊 Informasi Material: {material_preset}**
 
