@@ -36,7 +36,7 @@ st.markdown("""
         --bg-secondary: #f8f9fa;
         --bg-info: #e8f4f8;
         --bg-warning: #fff3cd;
-        --text-primary: #ffffff;
+        --text-primary: #0e1117;
         --text-secondary: #262730;
         --border-color: #667eea;
     }
