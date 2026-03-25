@@ -272,21 +272,18 @@ st.markdown("### 🔍 Ilustrasi Ray Tracing pada Prisma")
 
 from pathlib import Path
 
-# Path gambar (sama folder dengan app.py)
 image_path = Path("prisma_diagram.jpg")
 
-# Cek dan tampilkan gambar
 if image_path.exists():
     st.image(
         str(image_path),
-        caption="Diagram Skematik Dispersi Cahaya pada Prisma",
-        use_column_width=True,
+        caption="Diagram Skematik Dispersi Cahaya pada Prisma. Sumber: https://ivandwisandra.wordpress.com/jenis-jenis-polarisasi/",
+        width=500, 
         clamp=True
     )
-    st.success("✅ Gambar berhasil dimuat")
 else:
     st.error("⚠️ File prisma_diagram.jpg tidak ditemukan!")
-    st.info("💡 Pastikan file sudah diupload ke GitHub repository (satu folder dengan app.py)")
+    st.info("💡 Pastikan file sudah diupload ke GitHub (sama folder dengan app.py)")
 
 # Keterangan
 st.markdown("""
