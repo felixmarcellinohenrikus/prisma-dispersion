@@ -455,8 +455,8 @@ st.markdown("""
 st.markdown("""
 <div class="main-header">
     <h1>🔬 Simulasi Dispersi Cahaya pada Prisma</h1>
-    <h4>Dikembangkan oleh Felix Marcellino Henrikus, S.Si.</h4>
-    <h4>Program Studi Magister Sains Data, UKSW Salatiga</h4>
+    <h5>Dikembangkan oleh Felix Marcellino Henrikus, S.Si.</h5>
+    <h5>Program Studi Magister Sains Data, UKSW Salatiga</h5>
 </div>
 """, unsafe_allow_html=True)
 
@@ -1357,8 +1357,8 @@ st.markdown("---")
 footer_html = (
     "<div class='footer'>"
     "<h1>🔬 Simulasi Dispersi Cahaya pada Prisma</h1>"
-    "<h4>Dikembangkan oleh Felix Marcellino Henrikus, S.Si.</h4>"
-    "<h4>Program Studi Magister Sains Data, UKSW Salatiga</h4>"
+    "<h5>Dikembangkan oleh Felix Marcellino Henrikus, S.Si.</h5>"
+    "<h5>Program Studi Magister Sains Data, UKSW Salatiga</h5>"
     "<h5>Untuk Pembelajaran Optika Geometri di S1 Fisika UKSW</h5>"
     "</div>"
 )
