@@ -788,7 +788,7 @@ st.markdown("""
     div[data-testid="stDataFrame"] tbody td,
     table tbody td {
         text-align: center !important;
-        vertical-align: top !important;
+        vertical-align: middle !important;
         padding: 12px 10px !important;
         color: var(--text-primary) !important;
         border: 1px solid #e0e0e0 !important;
@@ -1054,8 +1054,11 @@ st.markdown("""
 <div class="info-box">
 
 **Rumus Sudut Deviasi Minimum:**
+<div style="text-align: center;">
 
 $$\\delta_{min} = 2 \\cdot \\arcsin\\left(n \\cdot \\sin\\left(\\frac{A}{2}\\right)\\right) - A$$
+
+</div>
 
 **Kondisi:** Terjadi saat $i_1 = r_2$ dan $r_1 = i_2$ (sinar simetris)
 
