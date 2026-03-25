@@ -274,16 +274,21 @@ from pathlib import Path
 
 image_path = Path("prisma_diagram.jpg")
 
-if image_path.exists():
-    st.image(
-        str(image_path),
-        caption="Diagram Skematik Dispersi Cahaya pada Prisma. Sumber: https://ivandwisandra.wordpress.com/jenis-jenis-polarisasi/",
-        width=500, 
-        clamp=True
-    )
-else:
-    st.error("⚠️ File prisma_diagram.jpg tidak ditemukan!")
-    st.info("💡 Pastikan file sudah diupload ke GitHub (sama folder dengan app.py)")
+# Bagi layar untuk center
+col1, col2, col3 = st.columns([1, 2, 1])
+
+with col2:
+    if image_path.exists():
+        st.image(
+            str(image_path),
+            caption="Diagram Skematik Dispersi Cahaya pada Prisma. Sumber: https://ivandwisandra.wordpress.com/jenis-jenis-polarisasi/",
+            width=400,
+            clamp=True
+        )
+        st.success("✅ Gambar berhasil dimuat")
+    else:
+        st.error("⚠️ File prisma_diagram.jpg tidak ditemukan!")
+        st.info("💡 Pastikan file sudah diupload ke GitHub (sama folder dengan app.py)")
 
 # Keterangan
 st.markdown("""
