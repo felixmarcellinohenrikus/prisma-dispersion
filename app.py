@@ -702,7 +702,7 @@ plt.tight_layout()
 st.pyplot(fig_disp)
 plt.close(fig_disp)
 
-st.markdown("""
+st.markdown("
 <div style='background: #fff3cd; padding: 15px; border-radius: 8px; margin-top: 10px;'>
 
 <strong>Catatan:</strong>
@@ -711,7 +711,7 @@ st.markdown("""
 - Material dengan dispersi tinggi (seperti flint glass) menghasilkan spektrum lebih lebar
 
 </div>
-""", unsafe_allow_html=True)
+", unsafe_allow_html=True)
 
 # ============================================================================
 # FOOTER
