@@ -327,6 +327,58 @@ st.markdown("""
     [data-theme="dark"] div[data-testid="stSidebar"] h3 {
         color: #ffffff !important;
     }
+
+    /* ========================================
+     * SIDEBAR SELECTBOX - DARK MODE FIX
+     * ======================================== */
+    
+    /* Selectbox dropdown options - dark mode */
+    [data-theme="dark"] div[data-baseweb="select"] > div,
+    [data-theme="dark"] div[data-baseweb="select"] input,
+    [data-theme="dark"] div[data-baseweb="select"] span,
+    [data-theme="dark"] div[data-baseweb="menu"] div[role="option"],
+    [data-theme="dark"] ul[data-baseweb="menu"] li[role="option"] {
+        color: #ffffff !important;
+        background-color: #262730 !important;
+    }
+    
+    /* Selectbox dropdown options - hover state */
+    [data-theme="dark"] div[data-baseweb="menu"] div[role="option"]:hover,
+    [data-theme="dark"] ul[data-baseweb="menu"] li[role="option"]:hover {
+        color: #ffffff !important;
+        background-color: #4a5568 !important;
+    }
+    
+    /* Selectbox label dan value */
+    [data-theme="dark"] .stSelectbox label,
+    [data-theme="dark"] .stSelectbox .stMarkdown,
+    [data-theme="dark"] div[data-testid="stSelectbox"] label,
+    [data-theme="dark"] div[data-testid="stSelectbox"] .stMarkdown {
+        color: #ffffff !important;
+    }
+    
+    /* Selectbox dropdown button/arrow */
+    [data-theme="dark"] div[data-baseweb="select"] svg {
+        fill: #ffffff !important;
+    }
+    
+    /* BaseWeb select component */
+    [data-theme="dark"] .baseweb-select,
+    [data-theme="dark"] [data-baseweb="select"] {
+        color: #ffffff !important;
+    }
+    
+    /* Menu items dalam dropdown */
+    [data-theme="dark"] [role="listbox"] [role="option"],
+    [data-theme="dark"] ul[role="listbox"] li {
+        color: #ffffff !important;
+        background-color: #262730 !important;
+    }
+    
+    [data-theme="dark"] [role="listbox"] [role="option"]:hover,
+    [data-theme="dark"] ul[role="listbox"] li:hover {
+        background-color: #4a5568 !important;
+    }
     
     /* ========================================
      * GENERAL
