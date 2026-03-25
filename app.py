@@ -24,12 +24,12 @@ st.set_page_config(
 )
 
 # ============================================================================
-# CUSTOM CSS - COMPLETE DARK MODE FIX
+# CUSTOM CSS
 # ============================================================================
 st.markdown("""
 <style>
     /* ========================================
-     * CSS VARIABLES - THEME AWARE
+     * CSS VARIABLES
      * ======================================== */
     :root {
         --bg-primary: #ffffff;
@@ -38,16 +38,7 @@ st.markdown("""
         --bg-warning: #fff3cd;
         --text-primary: #0e1117;
         --text-secondary: #262730;
-        --text-muted: #666666;
         --border-color: #667eea;
-        --table-header-bg: #667eea;
-        --table-header-text: #ffffff;
-        --button-bg: #667eea;
-        --button-text: #ffffff;
-        --metric-bg: #f0f2f6;
-        --metric-text: #0e1117;
-        --success-bg: #d4edda;
-        --success-text: #155724;
     }
 
     [data-theme="dark"] {
@@ -57,29 +48,56 @@ st.markdown("""
         --bg-warning: #4a3c00;
         --text-primary: #ffffff;
         --text-secondary: #e0e0e0;
-        --text-muted: #a0a0a0;
         --border-color: #8b9dc3;
-        --table-header-bg: #4a5568;
-        --table-header-text: #ffffff;
-        --button-bg: #4a6ee0;
-        --button-text: #ffffff;
-        --metric-bg: #262730;
-        --metric-text: #ffffff;
-        --success-bg: #1e4620;
-        --success-text: #7ee787;
     }
 
     /* ========================================
-     * ALL HEADINGS - VISIBLE IN DARK MODE
+     * HEADER - FORCE WHITE TEXT
      * ======================================== */
-    h1, h2, h3, h4, h5, h6,
-    .stMarkdown h1,
-    .stMarkdown h2,
+    .main-header {
+        text-align: center;
+        padding: 20px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 10px;
+        margin-bottom: 30px;
+    }
+
+    .main-header h1 {
+        color: #ffffff !important;
+        font-size: 2.5rem;
+        font-weight: bold;
+        margin: 0;
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+    }
+
+    .main-header p,
+    .main-header strong,
+    .main-header em {
+        color: #f0f0f0 !important;
+        margin: 10px 0 0 0;
+        font-size: 1rem;
+    }
+
+    /* Override Streamlit default heading colors */
+    .main-header h1,
+    .main-header h2,
+    .main-header h3,
+    .main-header h4,
+    .main-header h5,
+    .main-header h6 {
+        color: #ffffff !important;
+    }
+
+    /* ========================================
+     * ALL HEADINGS OUTSIDE HEADER
+     * ======================================== */
+    h3, h2, h1, h4, h5, h6,
     .stMarkdown h3,
+    .stMarkdown h2,
+    .stMarkdown h1,
     .stMarkdown h4,
     .stMarkdown h5,
     .stMarkdown h6,
-    h3[data-testid="stHeading"],
     div[data-testid="stMarkdownContainer"] h3,
     div[data-testid="stMarkdownContainer"] h2,
     div[data-testid="stMarkdownContainer"] h1 {
@@ -88,254 +106,132 @@ st.markdown("""
     }
 
     /* ========================================
-     * HEADER SECTION - ALWAYS WHITE
-     * ======================================== */
-    .main-header {
-        text-align: center;
-        padding: 20px;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        border-radius: 10px;
-        margin-bottom: 30px;
-        color: white !important;
-    }
-
-    .main-header h1,
-    .main-header h2,
-    .main-header p,
-    .main-header strong,
-    .main-header em {
-        color: white !important;
-    }
-
-    /* ========================================
-     * PARAGRAPH TEXT - THEME AWARE
+     * PARAGRAPH & TEXT
      * ======================================== */
     p, .stMarkdown p,
-    div[data-testid="stMarkdownContainer"] p {
+    div[data-testid="stMarkdownContainer"] p,
+    strong, b, em, i {
         color: var(--text-primary) !important;
     }
 
-    strong, b {
-        color: var(--text-primary) !important;
-    }
-
     /* ========================================
-     * METRIC CARDS - VISIBLE IN DARK MODE
-     * ======================================== */
-    div[data-testid="stMetric"],
-    .stMetric {
-        background: var(--metric-bg) !important;
-        padding: 15px !important;
-        border-radius: 8px;
-    }
-
-    div[data-testid="stMetricLabel"],
-    .stMetricLabel,
-    div[data-testid="stMetric"] label,
-    .stMetric label {
-        color: var(--metric-text) !important;
-        font-weight: bold;
-    }
-
-    div[data-testid="stMetricValue"],
-    .stMetricValue,
-    div[data-testid="stMetric"] .value,
-    .stMetric .value {
-        color: var(--metric-text) !important;
-        font-size: 2rem;
-        font-weight: bold;
-    }
-
-    /* ========================================
-     * SUCCESS/ALERT BOX - VISIBLE IN DARK MODE
-     * ======================================== */
-    div[data-testid="stAlert"][role="alert"],
-    .stAlert,
-    div[data-testid="stAlert"] {
-        background: var(--success-bg) !important;
-        color: var(--success-text) !important;
-        border: 1px solid var(--success-text);
-        border-radius: 8px;
-        padding: 10px;
-    }
-
-    div[data-testid="stAlert"] p,
-    div[data-testid="stAlert"] strong,
-    div[data-testid="stAlert"] span {
-        color: var(--success-text) !important;
-    }
-
-    /* ========================================
-     * INFO BOX - THEME AWARE
+     * INFO BOX - FIX FORMATTING
      * ======================================== */
     .info-box {
         background: var(--bg-info) !important;
-        padding: 15px;
+        padding: 15px !important;
         border-radius: 8px;
         border-left: 5px solid var(--border-color);
         margin: 10px 0;
         color: var(--text-primary) !important;
     }
 
-    .info-box h4,
-    .info-box h3,
     .info-box p,
     .info-box strong,
-    .info-box td,
-    .info-box th,
+    .info-box em,
     .info-box li,
-    .info-box em {
+    .info-box h4,
+    .info-box h3,
+    .info-box table,
+    .info-box td,
+    .info-box th {
+        color: var(--text-primary) !important;
+    }
+
+    .info-box ul,
+    .info-box ol {
+        margin: 10px 0;
+        padding-left: 20px;
+    }
+
+    .info-box li {
+        margin: 5px 0;
+        line-height: 1.6;
+    }
+
+    /* ========================================
+     * METRIC CARDS
+     * ======================================== */
+    div[data-testid="stMetric"] {
+        background: var(--bg-secondary) !important;
+        padding: 15px !important;
+        border-radius: 8px;
+    }
+
+    div[data-testid="stMetric"] label,
+    div[data-testid="stMetricValue"] {
         color: var(--text-primary) !important;
     }
 
     /* ========================================
-     * TABLE - HEADER TOP CENTER & VISIBLE
+     * SUCCESS/ALERT BOX
+     * ======================================== */
+    div[data-testid="stAlert"][role="alert"] {
+        background: var(--bg-info) !important;
+        color: var(--text-primary) !important;
+        border: 2px solid var(--border-color);
+        border-radius: 8px;
+        padding: 10px;
+    }
+
+    div[data-testid="stAlert"][role="alert"] p,
+    div[data-testid="stAlert"][role="alert"] strong {
+        color: var(--text-primary) !important;
+    }
+
+    /* ========================================
+     * TABLE - HEADER TOP CENTER
      * ======================================== */
     .stDataFrame thead th,
-    table thead th,
-    .stTable table thead th,
-    div[data-testid="stDataFrame"] thead th {
+    table thead th {
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
-        color: white !important;
+        color: #ffffff !important;
         font-weight: bold;
         text-align: center !important;
         vertical-align: top !important;
-        border: 1px solid #ffffff30;
         padding: 12px;
-        text-transform: uppercase;
-        font-size: 13px;
-        letter-spacing: 0.5px;
+        border: 1px solid #ffffff30;
     }
 
-    .stDataFrame tbody td,
-    table tbody td,
-    .stTable table tbody td,
-    div[data-testid="stDataFrame"] tbody td {
+    .stDataFrame tbody td {
         color: var(--text-primary) !important;
-        background-color: var(--bg-primary);
-        padding: 10px;
         text-align: center !important;
-    }
-
-    /* Alternating rows */
-    .stDataFrame tbody tr:nth-child(odd) td {
-        background-color: var(--bg-secondary);
-    }
-
-    .stDataFrame tbody tr:nth-child(even) td {
-        background-color: var(--bg-primary);
+        padding: 10px;
     }
 
     /* ========================================
-     * FOOTER - ALWAYS WHITE
-     * ======================================== */
-    .footer {
-        text-align: center;
-        padding: 20px;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        border-radius: 10px;
-        color: white !important;
-        margin-top: 30px;
-    }
-
-    .footer h4,
-    .footer p,
-    .footer em,
-    .footer strong {
-        color: white !important;
-    }
-
-    /* ========================================
-     * BUTTONS - VISIBLE IN DARK MODE
+     * BUTTONS
      * ======================================== */
     .stButton>button,
-    button[data-testid="stButton"],
-    div[data-testid="stButton"] button {
-        background-color: var(--button-bg) !important;
-        color: var(--button-text) !important;
-        border: 2px solid var(--border-color) !important;
-        font-weight: bold;
-        padding: 10px 20px;
-        border-radius: 6px;
-        cursor: pointer;
-    }
-
-    .stButton>button:hover,
-    button[data-testid="stButton"]:hover {
-        background-color: var(--border-color) !important;
-        color: white !important;
-    }
-
-    /* Download button specific */
-    div[data-testid="stDownloadButton"] button,
     .stDownloadButton>button {
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
-        color: white !important;
+        color: #ffffff !important;
         font-weight: bold;
         border: none;
+        border-radius: 6px;
+        padding: 10px 20px;
     }
 
     /* ========================================
-     * SIDEBAR - THEME AWARE
+     * SIDEBAR
      * ======================================== */
-    section[data-testid="stSidebar"],
-    div[data-testid="stSidebar"] {
+    section[data-testid="stSidebar"] {
         background-color: var(--bg-secondary) !important;
-        color: var(--text-primary) !important;
     }
 
     section[data-testid="stSidebar"] h1,
     section[data-testid="stSidebar"] h2,
     section[data-testid="stSidebar"] h3,
     section[data-testid="stSidebar"] p,
-    section[data-testid="stSidebar"] strong,
     section[data-testid="stSidebar"] label {
         color: var(--text-primary) !important;
     }
 
     /* ========================================
-     * GENERAL CONTAINERS
+     * GENERAL
      * ======================================== */
-    .stApp,
-    body,
-    div[data-testid="stAppViewContainer"] {
+    .stApp {
         background-color: var(--bg-primary) !important;
-        color: var(--text-primary) !important;
-    }
-
-    /* ========================================
-     * CODE BLOCKS
-     * ======================================== */
-    pre, code {
-        background: var(--bg-secondary);
-        color: var(--text-secondary);
-    }
-
-    /* ========================================
-     * LINKS
-     * ======================================== */
-    a {
-        color: var(--border-color) !important;
-    }
-
-    /* ========================================
-     * EXPANDER/COLLAPSIBLE
-     * ======================================== */
-    details summary {
-        color: var(--text-primary) !important;
-    }
-
-    /* ========================================
-     * INFO BOX (st.info)
-     * ======================================== */
-    div[data-testid="stAlert"][role="alert"] {
-        background: var(--bg-info) !important;
-        color: var(--text-primary) !important;
-        border-left: 5px solid var(--border-color);
-    }
-
-    div[data-testid="stAlert"][role="alert"] p,
-    div[data-testid="stAlert"][role="alert"] strong {
         color: var(--text-primary) !important;
     }
 </style>
@@ -346,13 +242,9 @@ st.markdown("""
 # ============================================================================
 st.markdown("""
 <div class="main-header">
-    <h1 style='margin: 0;'>🔬 Simulasi Dispersi Cahaya pada Prisma</h1>
-    <p style='margin: 10px 0 0 0; font-size: 16px;'>
-        Dikembangkan oleh <strong>Felix Marcellino Henrikus, S.Si.</strong>
-    </p>
-    <p style='margin: 10px 0 0 0; font-size: 16px;'>
-        Program Studi Magister Sains Data, UKSW Salatiga
-    </p>
+    <h1>🔬 Simulasi Dispersi Cahaya pada Prisma</h1>
+    <p>Dikembangkan oleh <strong>Felix Marcellino Henrikus, S.Si.</strong></p>
+    <p>Program Studi Magister Sains Data, UKSW Salatiga</p>
 </div>
 """, unsafe_allow_html=True)
 
@@ -956,23 +848,25 @@ st.pyplot(fig_n)
 plt.close(fig_n)
 
 st.markdown("""
-<div class="info-box">
-**💡 Interpretasi Grafik:**
-- Semakin **besar indeks bias (n)**, semakin **besar sudut deviasi (δ)**
-- Cahaya dengan **panjang gelombang lebih pendek** (biru) memiliki indeks bias lebih besar → deviasi lebih besar
-- **Dispersi** = perbedaan deviasi antar warna → spektrum terpisah
-
-**📐 Rumus Sudut Deviasi Minimum:**
-$$\\delta_{\\text{min}} = 2 \\cdot \\arcsin\\!\\big(n \\cdot \\sin(A/2)\\big) - A$$
+<div class="info-box" style="background: var(--bg-warning);">
+    <h4>💡 Interpretasi Grafik:</h4>
+    <ul>
+        <li>Semakin <strong>besar indeks bias (n)</strong>, semakin <strong>besar sudut deviasi (δ)</strong></li>
+        <li>Cahaya dengan <strong>panjang gelombang lebih pendek</strong> (biru) memiliki indeks bias lebih besar → deviasi lebih besar</li>
+        <li><strong>Dispersi</strong> = perbedaan deviasi antar warna → spektrum terpisah</li>
+    </ul>
+    
+    <h4>📐 Rumus Sudut Deviasi Minimum:</h4>
+    <p>$$\\delta_{\\text{min}} = 2 \\cdot \\arcsin\\!\\big(n \\cdot \\sin(A/2)\\big) - A$$</p>
 </div>
 """, unsafe_allow_html=True)
 
-# Untuk warning box
 st.markdown("""
 <div class="info-box" style="background: var(--bg-warning);">
-**📝 Catatan:**
-- Kurva menunjukkan **dispersi normal**: n menurun saat λ meningkat
-- **Dispersi tinggi** = kurva lebih curam = pemisahan warna lebih jelas
+    <h4> Catatan: </h4>
+    <ul>
+        <li> Kurva menunjukkan **dispersi normal**: n menurun saat λ meningkat
+        <li> **Dispersi tinggi** = kurva lebih curam = pemisahan warna lebih jelas
 </div>
 """, unsafe_allow_html=True)
 
