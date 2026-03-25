@@ -24,7 +24,7 @@ st.set_page_config(
 )
 
 # ============================================================================
-# CUSTOM CSS - THEME AWARE (LIGHT & DARK MODE)
+# CUSTOM CSS - THEME AWARE (LIGHT & DARK MODE) - IMPROVED
 # ============================================================================
 st.markdown("""
 <style>
@@ -32,21 +32,23 @@ st.markdown("""
      * CSS VARIABLES - OTOMATIS SESUAI THEME
      * ======================================== */
     :root {
-        /* Default (Light Mode) */
+        /* Light Mode (default) */
         --bg-primary: #ffffff;
         --bg-secondary: #f8f9fa;
         --bg-info: #e8f4f8;
         --bg-warning: #fff3cd;
-        --text-primary: #000000;
-        --text-secondary: #333333;
+        --text-primary: #0e1117;
+        --text-secondary: #262730;
         --text-muted: #666666;
         --border-color: #667eea;
+        --table-header-bg: #667eea;
+        --table-header-text: #ffffff;
         --shadow-color: rgba(0, 0, 0, 0.1);
     }
 
-    /* Dark Mode - Streamlit menggunakan data-theme="dark" */
+    /* Dark Mode */
     [data-theme="dark"] {
-        --bg-primary: #1e1e1e;
+        --bg-primary: #0e1117;
         --bg-secondary: #262730;
         --bg-info: #2d3748;
         --bg-warning: #4a3c00;
@@ -54,6 +56,8 @@ st.markdown("""
         --text-secondary: #e0e0e0;
         --text-muted: #a0a0a0;
         --border-color: #8b9dc3;
+        --table-header-bg: #4a5568;
+        --table-header-text: #ffffff;
         --shadow-color: rgba(255, 255, 255, 0.1);
     }
 
@@ -66,17 +70,40 @@ st.markdown("""
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         border-radius: 10px;
         margin-bottom: 30px;
-        color: white !important;  /* Header tetap putih (kontras dengan gradient) */
+        color: white !important;
     }
 
-    .main-header h1 {
+    .main-header h1,
+    .main-header h2,
+    .main-header h3,
+    .main-header h4,
+    .main-header h5,
+    .main-header h6 {
         color: white !important;
         margin: 0;
     }
 
-    .main-header p {
+    .main-header p,
+    .main-header em,
+    .main-header strong {
         color: #f0f0f0 !important;
         margin: 10px 0 0 0;
+    }
+
+    /* ========================================
+     * ALL HEADINGS - THEME AWARE
+     * ======================================== */
+    h1, h2, h3, h4, h5, h6,
+    .stMarkdown h1,
+    .stMarkdown h2,
+    .stMarkdown h3,
+    .stMarkdown h4,
+    .stMarkdown h5,
+    .stMarkdown h6,
+    .stMarkdown p strong,
+    .stMetricLabel,
+    .stMetricValue {
+        color: var(--text-primary) !important;
     }
 
     /* ========================================
@@ -96,8 +123,37 @@ st.markdown("""
     .info-box p,
     .info-box strong,
     .info-box td,
-    .info-box th {
+    .info-box th,
+    .info-box li {
         color: var(--text-primary) !important;
+    }
+
+    /* ========================================
+     * TABLE - THEME AWARE (PERBAIKAN HEADER)
+     * ======================================== */
+    .stDataFrame thead th,
+    table thead th,
+    .stTable table thead th {
+        background-color: var(--table-header-bg) !important;
+        color: var(--table-header-text) !important;
+        font-weight: bold;
+        border: 1px solid var(--border-color);
+    }
+
+    .stDataFrame tbody td,
+    table tbody td,
+    .stTable table tbody td {
+        color: var(--text-primary) !important;
+        background-color: var(--bg-primary);
+    }
+
+    /* Alternating row colors untuk readability */
+    .stDataFrame tbody tr:nth-child(odd) td {
+        background-color: var(--bg-secondary);
+    }
+
+    .stDataFrame tbody tr:nth-child(even) td {
+        background-color: var(--bg-primary);
     }
 
     /* ========================================
@@ -114,26 +170,23 @@ st.markdown("""
 
     .footer h4,
     .footer p,
-    .footer em {
+    .footer em,
+    .footer strong {
         color: white !important;
     }
 
     /* ========================================
      * GENERAL TEXT - THEME AWARE
      * ======================================== */
+    body,
+    .stApp,
     .stMarkdown,
     .stMarkdown p,
     .stMarkdown strong,
-    .stMarkdown em {
-        color: var(--text-primary);
-    }
-
-    /* ========================================
-     * TABLE - THEME AWARE
-     * ======================================== */
-    .stDataFrame,
-    .stTable {
-        color: var(--text-primary);
+    .stMarkdown em,
+    .stMarkdown li,
+    div[data-testid="stMarkdownContainer"] {
+        color: var(--text-primary) !important;
     }
 
     /* ========================================
@@ -145,12 +198,49 @@ st.markdown("""
         border-radius: 8px;
     }
 
+    .stMetricLabel,
+    .stMetricValue {
+        color: var(--text-primary) !important;
+    }
+
     /* ========================================
      * CODE BLOCKS - THEME AWARE
      * ======================================== */
     pre, code {
         background: var(--bg-secondary);
         color: var(--text-secondary);
+    }
+
+    /* ========================================
+     * SIDEBAR - THEME AWARE
+     * ======================================== */
+    section[data-testid="stSidebar"] {
+        background-color: var(--bg-secondary);
+        color: var(--text-primary);
+    }
+
+    section[data-testid="stSidebar"] h1,
+    section[data-testid="stSidebar"] h2,
+    section[data-testid="stSidebar"] h3,
+    section[data-testid="stSidebar"] p,
+    section[data-testid="stSidebar"] strong {
+        color: var(--text-primary) !important;
+    }
+
+    /* ========================================
+     * BUTTONS - THEME AWARE
+     * ======================================== */
+    .stButton>button {
+        color: var(--text-primary);
+        background-color: var(--bg-primary);
+        border: 1px solid var(--border-color);
+    }
+
+    /* ========================================
+     * LINKS - THEME AWARE
+     * ======================================== */
+    a {
+        color: var(--border-color) !important;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -495,7 +585,65 @@ if results:
     df_display['Indeks Bias (n)'] = df_display['Indeks Bias (n)'].round(4)
     df_display['Sudut Deviasi (°)'] = df_display['Sudut Deviasi (°)'].round(2)
     
-    st.dataframe(df_display, use_container_width=True, hide_index=True)
+    # Custom styling untuk tabel
+    st.markdown("""
+    <style>
+    .custom-table {
+        border-collapse: collapse;
+        width: 100%;
+        margin: 20px 0;
+        font-size: 14px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    .custom-table thead tr {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        text-align: left;
+        font-weight: bold;
+    }
+    
+    .custom-table th,
+    .custom-table td {
+        padding: 12px 15px;
+        border: 1px solid #ddd;
+    }
+    
+    .custom-table tbody tr {
+        border-bottom: 1px solid #ddd;
+    }
+    
+    .custom-table tbody tr:nth-of-type(even) {
+        background-color: #f8f9fa;
+    }
+    
+    .custom-table tbody tr:hover {
+        background-color: #e8f4f8;
+        cursor: pointer;
+    }
+    
+    /* Dark mode untuk custom table */
+    [data-theme="dark"] .custom-table tbody tr:nth-of-type(even) {
+        background-color: #262730;
+    }
+    
+    [data-theme="dark"] .custom-table tbody tr:hover {
+        background-color: #2d3748;
+    }
+    
+    [data-theme="dark"] .custom-table th,
+    [data-theme="dark"] .custom-table td {
+        border-color: #4a5568;
+    }
+    </style>
+    """, unsafe_allow_html=True)
+    
+    # Render tabel dengan HTML custom
+    html_table = df_display.to_html(index=False, classes='custom-table', border=0)
+    st.markdown(html_table, unsafe_allow_html=True)
+    
+    # Atau tetap gunakan st.dataframe dengan styling
+    # st.dataframe(df_display, use_container_width=True, hide_index=True)
 
 # ============================================================================
 # GRAFIK: CAUCHY VS SELLMEIER (DINAMIS - TERGANTUNG MATERIAL)
