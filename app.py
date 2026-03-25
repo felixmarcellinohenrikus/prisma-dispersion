@@ -643,7 +643,7 @@ with col2:
             width=400,
             clamp=True
         )
-        st.success("✅ Gambar berhasil dimuat")
+        #st.success("✅ Gambar berhasil dimuat")
     else:
         st.error("⚠️ File prisma_diagram.jpg tidak ditemukan!")
         st.info("💡 Pastikan file sudah diupload ke GitHub (sama folder dengan app.py)")
